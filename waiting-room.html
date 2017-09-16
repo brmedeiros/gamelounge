@@ -24,15 +24,37 @@
 		<div class="md-col-12 text-center">
 		    <h4><i class="fa fa-circle-o-notch fa-spin"></i> Waiting for players...</h4>
 		    <ul class="list-group">
-			<li class="list-group-item bordeless black-bg">player1</li>
-			<li class="list-group-item bordeless black-bg">player2</li>
+			<li class="list-group-item bordeless black-bg">
+			    <form>
+				<div class="input-group">
+				    <input type="text" class="form-control black-bg" placeholder="player1">
+				    <div class="input-group-btn">
+					<button type="button" class="btn btn-primary">
+					    Ready <i class="fa fa-question" aria-hidden="true"></i>
+					</button>
+				    </div>
+				</div>
+			    </form>
+			</li>
+			<li class="list-group-item bordeless black-bg">
+			    <form>
+				<div class="input-group">
+				    <input type="text" class="form-control black-bg" placeholder="player2">
+				    <div class="input-group-btn">
+					<button type="button" class="btn btn-primary">
+					    Ready <i class="fa fa-question" aria-hidden="true"></i>
+					</button>
+				    </div>
+				</div>
+			    </form>
+			</li>
 			<li class="list-group-item bordeless black-bg">...</li>
 		    </ul>
 		</div>
 	    </div>
 	    <div class="row">
-		<div class="md-col-12 text-center">
-		    <button type="button" class="btn btn-primary btn-lg btn-margin12" id="new-game">Start Game</button>
+		<div class="md-col-12 text-center" id="start-game">
+		    <button type="button" class="btn btn-primary btn-lg btn-margin12">Start Game</button>
 		</div>
 	    </div>
 	</div>
