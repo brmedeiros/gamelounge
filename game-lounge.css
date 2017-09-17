@@ -7,23 +7,44 @@ body {
     color: white;
 }
 
-.btn-margin12 {
-    margin: 10px;
-}
-
-li.bordeless {
-    border: none;
-}
-
 hr.margin20 {
     margin: 20px;
 }
 
-.head-border{
-    border: 1px solid transparent;
+.btn-margin10 {
+    margin: 10px;
+}
+
+.btn-inline {
+    padding: 0px;
+    margin-top: 10px;
+    margin-left: 19px;
+    float: left;
+}
+
+li.borderless {
+    border: none;
+}
+
+.center-title {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    margin-top: 10px;
+    z-index: -1;
+}
+
+.game-code-box {
+    border: 0px;
     border-radius: 6px;
     margin-left: 20px;
     margin-right: 20px;
     padding-top: 10px;
     background-color: #337ab7;
+}
+
+.padding-lr20 {
+    padding-left: 20px;
+    padding-right: 20px;
 }
