@@ -25,4 +25,12 @@ $(function() {
 	$("#root").load("home-content.html");
     });
 
+    $("#p1-ready-btn").click(function() {
+	$("#p1-ready").toggleClass("fa-question fa-check");
+    });
+
+    $("#p2-ready-btn").click(function() {
+	$("#p2-ready").toggleClass("fa-question fa-check");
+    });
+
 });

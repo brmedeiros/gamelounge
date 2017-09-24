@@ -1,4 +1,4 @@
-<!-- back button -->
+<!-- header/back button -->
 <div class="row">
     <div class="col mt-2 mb-4">
 	<div class="d-flex">
@@ -17,7 +17,7 @@
 <div class="row" id="game-code">
     <div class="col text-center">
 	<h3>Game Code</h3>
-	<h1 class="border border-primary rounded bg-primary p-2" id="code">CODE</h1>
+	<h1 class="border border-primary rounded bg-primary p-2" id="code">&nbsp</h1>
 	<p>send it to your friends</p>
 	<hr>
     </div>
@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<!-- waiting spinner -->
+<!-- waiting -->
 <div class="row mt-2">
     <div class="col text-center">
 	<h4><i class="fa fa-circle-o-notch fa-spin"></i> Waiting for players...</h4>
@@ -52,8 +52,8 @@
 	<input type="text" class="form-control" placeholder="Player 1">
     </div>
     <div class="col col-grow0 text-right">
-	<button type="button" class="btn btn-primary">
-	    Ready <i class="fa fa-question" aria-hidden="true"></i>
+	<button type="button" class="btn btn-primary" id="p1-ready-btn">
+	    Ready <i class="fa fa-fw fa-question" id="p1-ready" aria-hidden="true"></i>
 	</button>
     </div>
 </div>
@@ -62,8 +62,8 @@
 	<input type="email" class="form-control" placeholder="Player 2">
     </div>
     <div class="col col-grow0 text-right">
-	<button type="button" class="btn btn-primary">
-	    Ready <i class="fa fa-question" aria-hidden="true"></i>
+	<button type="button" class="btn btn-primary" id="p2-ready-btn">
+	    Ready <i class="fa fa-fw fa-question" id="p2-ready" aria-hidden="true"></i>
 	</button>
     </div>
 </div>
