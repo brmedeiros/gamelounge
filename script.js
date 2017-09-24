@@ -1,24 +1,28 @@
 $(function() {
 
-    $("#create-new-game-btn").click(function() {
-    	$("#root-home").load("waiting-room.html", function() {
-    	    $.getJSON( "/code-gen/", function( data ) {
-    		$("#code").text(data);
-    		});
-    	});
-    });
+    $.getScript("script.js");
 
-    $("#join-game-btn").click(function() {
-    	$("#root-home").load("waiting-room.html", function() {
-    	    $("#start-game").remove();
+    $("#create-new-game-btn").click(function() {
+    	$("#root").load("waiting-room-content.html", function() {
+	    $("#join-waiting").remove();
     	    $.getJSON( "/code-gen/", function( data ) {
     		$("#code").text(data);
     	    });
     	});
     });
 
+    $("#join-game-btn").click(function() {
+    	$("#root").load("waiting-room-content.html", function() {
+	    $("#game-code").remove();
+    	    $("#start-game").remove();
+    	    $.getJSON( "/code-gen/", function( data ) {
+    		$("#code").text(data);
+    	    });
+	});
+    });
+
     $("#back-btn").click(function() {
-    	$("#root-waiting-room").load("home.html");
+	$("#root").load("home-content.html");
     });
 
 });
