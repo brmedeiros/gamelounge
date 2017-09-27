@@ -1,7 +1,7 @@
 var joinOrCreated;
 
 function loadHome() {
-    $("#root").load("home-content.html", function() {
+    $("#root").load("home.part.html", function() {
 	$("#create-new-game-btn").click(function() {
 	    joinOrCreated = this.id;
 	    loadWaitingRoom();
@@ -14,7 +14,7 @@ function loadHome() {
 }
 
 function loadWaitingRoom() {
-    $("#root").load("waiting-room-content.html", function() {
+    $("#root").load("waiting-room.part.html", function() {
 	waitingRoomDefaultBehavior();
 	if (joinOrCreated == "create-new-game-btn") {
 	    $("#join-waiting").remove();
