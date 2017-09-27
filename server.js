@@ -1,14 +1,24 @@
 var restify = require('restify');
+var CookieParser = require('restify-cookies');
+const uuidv4 = require('uuid/v4');
 
-function respond(req, res, next) {
-    res.send('何？！');
-    next();
+function checkCookie(req, res, next) {
+    if (!req.cookies['username']) {
+	res.setCookie('username', uuidv4());
+    }
+    return next();
+}
+
+function codeGen(req, res, next) {
+    res.send('hehexD');
+    return next();
 }
 
 var server = restify.createServer({name: 'Game Lounge'});
+server.use(CookieParser.parse); //restify cookie handler
+server.use(checkCookie); //our handler for verifying cookies
 
-server.get('/code-gen/', respond);
-//server.head('/code-gen/', respond);
+server.get('/code-gen/', codeGen);
 
 server.get(/.*/, restify.plugins.serveStatic({
     'directory': __dirname,
