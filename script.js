@@ -18,7 +18,7 @@ function loadWaitingRoom() {
 	waitingRoomDefaultBehavior();
 	if (joinOrCreated == "create-new-game-btn") {
 	    $("#join-waiting").remove();
-     	    $.getJSON( "/code-gen/", function( data ) {
+     	    $.getJSON( "/new-room/", function( data ) {
      		$("#code").text(data);
      	    });
 	} else if (joinOrCreated == "join-game-btn") {
