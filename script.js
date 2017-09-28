@@ -1,31 +1,51 @@
 var joinOrCreated;
+var responseData;
 
 function loadHome() {
-    $("#root").load("home.part.html", function() {
+    $("#root").hide().load("home.part.html", function() {
+	$("#creator-name-form").hide();
 	$("#create-new-game-btn").click(function() {
 	    joinOrCreated = this.id;
-	    loadWaitingRoom();
+	    $("#create-new-game-btn").toggleClass("disabled");
+	    $("#creator-name-form").slideToggle("fast");
+
+	    $("#create-room-btn").click(function() {
+		$.post("/new-room/", $("#creatorName").serialize(), function(data) {
+		    responseData = data;
+		    //console.log(responseData);
+		});
+		loadWaitingRoom();
+	    });
 	});
+
+	$("#player-name-form").hide();
 	$("#join-game-btn").click(function() {
 	    joinOrCreated = this.id;
-	    loadWaitingRoom();
+	    $("#join-game-btn").toggleClass("disabled");
+	    $("#player-name-form").slideToggle("fast");
+
+	    $("#join-room-btn").click(function() {
+		$.post("/join-room/", $("#playerName").serialize(), function(data) {
+		    responseData = data;
+		    //console.log(data['code']);
+		});
+		loadWaitingRoom();
+	    });
 	});
-    });
+    }).fadeIn('slow');
 }
 
 function loadWaitingRoom() {
-    $("#root").load("waiting-room.part.html", function() {
+    $("#root").hide().load("waiting-room.part.html", function() {
 	waitingRoomDefaultBehavior();
 	if (joinOrCreated == "create-new-game-btn") {
 	    $("#join-waiting").remove();
-     	    $.getJSON( "/new-room/", function( data ) {
-     		$("#code").text(data);
-     	    });
-	} else if (joinOrCreated == "join-game-btn") {
+	    $("#code").text(responseData['code']);
+     	} else if (joinOrCreated == "join-game-btn") {
 	    $("#game-code").remove();
  	    $("#start-game").remove();
 	}
-    });
+    }).fadeIn('slow');
 }
 
 function waitingRoomDefaultBehavior() {

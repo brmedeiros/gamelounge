@@ -15,16 +15,36 @@
     </div>
 </div>
 
-<!-- create & join buttons -->
-<div class="row">
+<div class="row"">
+    <!-- create button -->
     <div class="col text-center">
 	<button type="button" class="btn btn-primary btn-lg m-2"
-		id="create-new-game-btn">Create New Game</button>
+		id="create-new-game-btn">Create New Game
+	</button>
+	<!-- creator name form -->
+	<form class="form-inline justify-content-center" id="creator-name-form">
+	    <div class="form-group mr-2">
+		<input type="text" id="creatorName" class="form-control form-control-lg"
+		       placeholder="Enter your name" name="username" value="">
+	    </div>
+	    <button type="button" class="btn btn-primary btn-lg mr-2" id="create-room-btn">Create!</button>
+    	</form>
     </div>
 </div>
+
 <div class="row">
+    <!-- join button -->
     <div class="col text-center">
 	<button type="button" class="btn btn-primary btn-lg m-2"
-		id="join-game-btn">Join Game</button>
+		id="join-game-btn">Join Game
+	</button>
+	<!-- player name form -->
+	<form  class="form-inline justify-content-center" id="player-name-form">
+	    <div class="form-group mr-2">
+		<input type="text" id="playerName" class="form-control form-control-lg"
+		       placeholder="Enter your name" name="username" value="">
+	    </div>
+	    <button type="button" class="btn btn-primary btn-lg mr-2" id="join-room-btn">Join!</button>
+	</form>
     </div>
 </div>
