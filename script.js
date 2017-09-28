@@ -1,4 +1,5 @@
 var joinOrCreated;
+var responseData;
 
 function loadHome() {
     $("#root").hide().load("home.part.html", function() {
@@ -10,7 +11,8 @@ function loadHome() {
 
 	    $("#create-room-btn").click(function() {
 		$.post("/new-room/", $("#creatorName").serialize(), function(data) {
-		    //alert(data);
+		    responseData = data;
+		    //console.log(responseData);
 		});
 		loadWaitingRoom();
 	    });
@@ -24,7 +26,8 @@ function loadHome() {
 
 	    $("#join-room-btn").click(function() {
 		$.post("/join-room/", $("#playerName").serialize(), function(data) {
-		    //alert(data);
+		    responseData = data;
+		    //console.log(data['code']);
 		});
 		loadWaitingRoom();
 	    });
@@ -37,10 +40,8 @@ function loadWaitingRoom() {
 	waitingRoomDefaultBehavior();
 	if (joinOrCreated == "create-new-game-btn") {
 	    $("#join-waiting").remove();
-     	    //$.getJSON( "/new-room/", function( data ) {
-     	    //$("#code").text(data);
-     	    //});
-	} else if (joinOrCreated == "join-game-btn") {
+	    $("#code").text(responseData['code']);
+     	} else if (joinOrCreated == "join-game-btn") {
 	    $("#game-code").remove();
  	    $("#start-game").remove();
 	}

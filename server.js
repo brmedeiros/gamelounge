@@ -24,12 +24,19 @@ var gameRoomList = [];
 
 function createRoom(req, res, next) {
     var code = codeGen();
-    var newGameRoom  = new GameRoom(req.cookies['userid'], code);
+    var newGameRoom  = new GameRoom(req.body.username, code);
     gameRoomList.push(newGameRoom);
-    //console.log(gameRoomList);
-    //console.log(req.body.code);
-    //console.log('ok');
-    res.send(code);
+    var data = {};
+    data['code'] = newGameRoom.code;
+    data['creator'] = newGameRoom.creator;
+    data['players'] = newGameRoom.players;
+    res.json(newGameRoom);
+
+    console.log(gameRoomList);
+    console.log('\n');
+    console.log(data);
+    console.log('\n');
+
     return next();
 }
 
