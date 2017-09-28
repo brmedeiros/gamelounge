@@ -38,7 +38,8 @@ server.use(CookieParser.parse); //restify cookie handler
 server.use(checkCookie); //our handler for verifying/creating cookies
 server.use(restify.plugins.bodyParser()); //restify handler for parsing post body params
 
-server.get('/new-room/', createRoom);
+server.post('/new-room/', createRoom);
+server.post('/join-room/', createRoom);
 
 server.get(/.*/, restify.plugins.serveStatic({
     'directory': __dirname,
