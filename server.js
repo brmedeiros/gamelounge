@@ -10,7 +10,7 @@ function checkCookie(req, res, next) {
 }
 
 function codeGen() {
-    var code = 'hehexD';
+    var code = 'finally';
     return code;
 }
 
@@ -26,15 +26,9 @@ function createRoom(req, res, next) {
     var code = codeGen();
     var newGameRoom  = new GameRoom(req.body.username, code);
     gameRoomList.push(newGameRoom);
-    var data = {};
-    data['code'] = newGameRoom.code;
-    data['creator'] = newGameRoom.creator;
-    data['players'] = newGameRoom.players;
     res.json(newGameRoom);
 
     console.log(gameRoomList);
-    console.log('\n');
-    console.log(data);
     console.log('\n');
 
     return next();

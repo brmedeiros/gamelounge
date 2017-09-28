@@ -12,7 +12,7 @@ function loadHome() {
 	    $("#create-room-btn").click(function() {
 		$.post("/new-room/", $("#creatorName").serialize(), function(data) {
 		    responseData = data;
-		    //console.log(responseData);
+		    console.log(responseData);
 		});
 		loadWaitingRoom();
 	    });
@@ -27,7 +27,7 @@ function loadHome() {
 	    $("#join-room-btn").click(function() {
 		$.post("/join-room/", $("#playerName").serialize(), function(data) {
 		    responseData = data;
-		    //console.log(data['code']);
+		    console.log(responseData);
 		});
 		loadWaitingRoom();
 	    });
