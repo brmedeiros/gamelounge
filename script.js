@@ -34,6 +34,15 @@ function loadHome() {
 		loadWaitingRoom();
 	    });
 	});
+
+	$(document).mouseup(function(event) {
+	    var nameForm = $("#creator-name-form, #player-name-form");
+	    var openFormBtn = $("#create-new-game-btn, #join-game-btn");
+	    if (!nameForm.is(event.target) && !openFormBtn.is(event.target) && nameForm.has(event.target).length === 0) {
+		nameForm.slideUp();
+		openFormBtn.removeClass("disabled");
+	    }
+	});
     }).fadeIn('slow');
 }
 
