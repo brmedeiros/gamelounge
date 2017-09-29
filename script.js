@@ -9,7 +9,8 @@ function loadHome() {
 	    $("#create-new-game-btn").toggleClass("disabled");
 	    $("#creator-name-form").slideToggle("fast");
 
-	    $("#create-room-btn").click(function() {
+	    $("#creator-name-form").submit(function(event) {
+		event.preventDefault();
 		$.post("/new-room/", $("#creatorName").serialize(), function(data) {
 		    responseData = data;
 		    console.log(responseData);
@@ -24,7 +25,8 @@ function loadHome() {
 	    $("#join-game-btn").toggleClass("disabled");
 	    $("#player-name-form").slideToggle("fast");
 
-	    $("#join-room-btn").click(function() {
+	    $("#player-name-form").submit(function(event) {
+		event.preventDefault();
 		$.post("/join-room/", $("#playerName").serialize(), function(data) {
 		    responseData = data;
 		    console.log(responseData);
