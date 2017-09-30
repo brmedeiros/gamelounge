@@ -11,7 +11,7 @@ function loadHome() {
 
 	    $("#creator-name-form").submit(function(event) {
 		event.preventDefault();
-		$.post("/new-room/", $("#creatorName").serialize(), function(data) {
+		$.post("/new-room/", $("#creator-name-form").serialize(), function(data) {
 		    responseData = data;
 		    console.log(responseData);
 		});
@@ -27,7 +27,7 @@ function loadHome() {
 
 	    $("#player-name-form").submit(function(event) {
 		event.preventDefault();
-		$.post("/join-room/", $("#playerName").serialize(), function(data) {
+		$.post("/join-room/", $("#player-name-form").serialize(), function(data) {
 		    responseData = data;
 		    console.log(responseData);
 		});
@@ -35,6 +35,7 @@ function loadHome() {
 	    });
 	});
 
+	//hide home forms on click outside
 	$(document).mouseup(function(event) {
 	    var nameForm = $("#creator-name-form, #player-name-form");
 	    var openFormBtn = $("#create-new-game-btn, #join-game-btn");
@@ -55,6 +56,7 @@ function loadWaitingRoom() {
      	} else if (joinOrCreated == "join-game-btn") {
 	    $("#game-code").remove();
  	    $("#start-game").remove();
+	    $("#creator-name").text(responseData['creator'] + "'s game");
 	}
     }).fadeIn('slow');
 }
