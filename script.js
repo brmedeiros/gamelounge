@@ -14,33 +14,6 @@ function loadHome() {
     }).fadeIn('slow');
 }
 
-function loadWaitingRoom() {
-    $("#root").hide().load("waiting-room.part.html", function() {
-	waitingRoomDefaultBehavior();
-	if (joinOrCreated == "create-new-game-btn") {
-	    $("#join-waiting").remove();
-	    $("#code").text(responseData['code']);
-     	} else if (joinOrCreated == "join-game-btn") {
-	    $("#game-code").remove();
- 	    $("#start-game").remove();
-	    $("#creator-name").text(responseData['creator'] + "'s game");
-	}
-    }).fadeIn('slow');
-}
-
-function waitingRoomDefaultBehavior() {
-    $("#back-btn").click(function() {
-	loadHome();
-    });
-    $("#p1-ready-btn").click(function() {
-	$("#p1-ready").toggleClass("fa-question fa-check");
-    });
-
-    $("#p2-ready-btn").click(function() {
-	$("#p2-ready").toggleClass("fa-question fa-check");
-    });
-}
-
 function formDefaultBehavior(form, url) {
     $(form).hide();
     $(form + "-btn").click(function() {
@@ -68,5 +41,32 @@ function hideForm(form) {
 	    $(form + "-btn").removeClass("btn-dark");
 	    $(form + "-btn").addClass("btn-primary");
 	}
+    });
+}
+
+function loadWaitingRoom() {
+    $("#root").hide().load("waiting-room.part.html", function() {
+	waitingRoomDefaultBehavior();
+	if (joinOrCreated == "create-new-game-btn") {
+	    $("#join-waiting").remove();
+	    $("#code").text(responseData['code']);
+     	} else if (joinOrCreated == "join-game-btn") {
+	    $("#game-code").remove();
+ 	    $("#start-game").remove();
+	    $("#creator-name").text(responseData['creator'] + "'s game");
+	}
+    }).fadeIn('slow');
+}
+
+function waitingRoomDefaultBehavior() {
+    $("#back-btn").click(function() {
+	loadHome();
+    });
+    $("#p1-ready-btn").click(function() {
+	$("#p1-ready").toggleClass("fa-question fa-check");
+    });
+
+    $("#p2-ready-btn").click(function() {
+	$("#p2-ready").toggleClass("fa-question fa-check");
     });
 }
