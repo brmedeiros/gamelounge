@@ -1,43 +1,16 @@
 var joinOrCreated;
 var responseData;
 
+$(function() {
+    loadHome();
+ });
+
 function loadHome() {
     $("#root").hide().load("home.part.html", function() {
-	$("#creator-name-form").hide();
-	$("#create-new-game-btn").click(function() {
-	    joinOrCreated = this.id;
-	    $("#create-new-game-btn").toggleClass("btn-primary btn-dark");
-	    $("#creator-name-form").slideToggle("fast");
-
-	    $("#creator-name-form").submit(function(event) {
-		event.preventDefault();
-		$.post("/new-room/", $("#creator-name-form").serialize(), function(data) {
-		    responseData = data;
-		    console.log(responseData);
-		});
-		loadWaitingRoom();
-	    });
-	});
-
-	$("#player-name-form").hide();
-	$("#join-game-btn").click(function() {
-	    joinOrCreated = this.id;
-	    $("#join-game-btn").toggleClass("btn-primary btn-dark");
-	    $("#player-name-form").slideToggle("fast");
-
-	    $("#player-name-form").submit(function(event) {
-		event.preventDefault();
-		$.post("/join-room/", $("#player-name-form").serialize(), function(data) {
-		    responseData = data;
-		    console.log(responseData);
-		});
-		loadWaitingRoom();
-	    });
-	});
-
-	hideShowForm("#creator-name-form", "#create-new-game-btn");
-	hideShowForm("#player-name-form", "#join-game-btn");
-
+	formDefaultBehavior("#create-new-game", "/new-room");
+	formDefaultBehavior("#join-game", "/join-room");
+	hideForm("#create-new-game");
+	hideForm("#join-game");
     }).fadeIn('slow');
 }
 
@@ -68,16 +41,32 @@ function waitingRoomDefaultBehavior() {
     });
 }
 
-function hideShowForm(form, button) {
-    $(document).mouseup(function(event) {
-	if (!$(form).is(event.target) && !$(button).is(event.target) && $(form).has(event.target).length === 0) {
-	    $(form).slideUp("fast");
-	    $(button).removeClass("btn-dark");
-	    $(button).addClass("btn-primary");
-	}
+function formDefaultBehavior(form, url) {
+    $(form).hide();
+    $(form + "-btn").click(function() {
+	joinOrCreated = this.id;
+	$(form + "-btn").toggleClass("btn-primary btn-dark");
+	$(form).slideToggle("fast");
+
+	$(form).submit(function(event) {
+	    event.preventDefault();
+	    $.post(url, $(form).serialize(),function(data){
+		responseData = data;
+		console.log(responseData);
+		if (responseData) {
+		    loadWaitingRoom();
+		}
+	    });
+	});
     });
 }
 
-$(function() {
-    loadHome();
- });
+function hideForm(form) {
+    $(document).mouseup(function(event) {
+	if (!$(form).is(event.target) && !$(form + "-btn").is(event.target) && $(form).has(event.target).length === 0) {
+	    $(form).slideUp("fast");
+	    $(form + "-btn").removeClass("btn-dark");
+	    $(form + "-btn").addClass("btn-primary");
+	}
+    });
+}

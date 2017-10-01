@@ -36,21 +36,20 @@ function createRoom(req, res, next) {
 }
 
 function joinRoom(req, res, next) {
-    console.log(req.body);
+    //console.log(req.body);
     var game;
     for (game of gameRoomList){
 	if (req.body.code == game.code){
 	    game.players.push(req.body.username);
 	    res.json(game);
 
-	    //console.log(req.body);
 	    console.log(gameRoomList);
 	    console.log('\n');
 
 	    return next();
 	}
     }
-    return undefined;
+    return next();
 }
 
 var server = restify.createServer({name: 'Game Lounge'});
