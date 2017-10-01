@@ -1,4 +1,4 @@
-var joinOrCreated;
+var joinOrCreate;
 var responseData;
 
 $(function() {
@@ -17,7 +17,7 @@ function loadHome() {
 function formDefaultBehavior(form, url) {
     $(form).hide();
     $(form + "-btn").click(function() {
-	joinOrCreated = this.id;
+	joinOrCreate = this.id;
 	$(form + "-btn").toggleClass("btn-primary btn-dark");
 	$(form).slideToggle("fast");
 
@@ -47,10 +47,10 @@ function hideForm(form) {
 function loadWaitingRoom() {
     $("#root").hide().load("waiting-room.part.html", function() {
 	waitingRoomDefaultBehavior();
-	if (joinOrCreated == "create-new-game-btn") {
+	if (joinOrCreate == "create-new-game-btn") {
 	    $("#join-waiting").remove();
 	    $("#code").text(responseData['code']);
-     	} else if (joinOrCreated == "join-game-btn") {
+     	} else if (joinOrCreate == "join-game-btn") {
 	    $("#game-code").remove();
  	    $("#start-game").remove();
 	    $("#creator-name").text(responseData['creator'] + "'s game");

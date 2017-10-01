@@ -9,8 +9,12 @@ function checkCookie(req, res, next) {
     return next();
 }
 
-function codeGen() {
-    var code = 'hey';
+function codeGen(codeLength) {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+    var code = '';
+    for (var i = 0; i < codeLength; ++i) {
+	code += chars[Math.ceil(Math.random() * (chars.length)) - 1];
+    }
     return code;
 }
 
@@ -23,7 +27,7 @@ function GameRoom(creator, code) {
 var gameRoomList = [];
 
 function createRoom(req, res, next) {
-    var code = codeGen();
+    var code = codeGen(5);
     var newGameRoom  = new GameRoom(req.body.username, code);
     gameRoomList.push(newGameRoom);
     res.json(newGameRoom);
@@ -37,8 +41,7 @@ function createRoom(req, res, next) {
 
 function joinRoom(req, res, next) {
     //console.log(req.body);
-    var game;
-    for (game of gameRoomList){
+    for (var game of gameRoomList){
 	if (req.body.code == game.code){
 	    game.players.push(req.body.username);
 	    res.json(game);
