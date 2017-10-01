@@ -6,7 +6,7 @@ function loadHome() {
 	$("#creator-name-form").hide();
 	$("#create-new-game-btn").click(function() {
 	    joinOrCreated = this.id;
-	    $("#create-new-game-btn").toggleClass("disabled");
+	    $("#create-new-game-btn").toggleClass("btn-primary btn-dark");
 	    $("#creator-name-form").slideToggle("fast");
 
 	    $("#creator-name-form").submit(function(event) {
@@ -22,7 +22,7 @@ function loadHome() {
 	$("#player-name-form").hide();
 	$("#join-game-btn").click(function() {
 	    joinOrCreated = this.id;
-	    $("#join-game-btn").toggleClass("disabled");
+	    $("#join-game-btn").toggleClass("btn-primary btn-dark");
 	    $("#player-name-form").slideToggle("fast");
 
 	    $("#player-name-form").submit(function(event) {
@@ -35,15 +35,9 @@ function loadHome() {
 	    });
 	});
 
-	//hide home forms on click outside
-	$(document).mouseup(function(event) {
-	    var nameForm = $("#creator-name-form, #player-name-form");
-	    var openFormBtn = $("#create-new-game-btn, #join-game-btn");
-	    if (!nameForm.is(event.target) && !openFormBtn.is(event.target) && nameForm.has(event.target).length === 0) {
-		nameForm.slideUp();
-		openFormBtn.removeClass("disabled");
-	    }
-	});
+	hideShowForm("#creator-name-form", "#create-new-game-btn");
+	hideShowForm("#player-name-form", "#join-game-btn");
+
     }).fadeIn('slow');
 }
 
@@ -71,6 +65,16 @@ function waitingRoomDefaultBehavior() {
 
     $("#p2-ready-btn").click(function() {
 	$("#p2-ready").toggleClass("fa-question fa-check");
+    });
+}
+
+function hideShowForm(form, button) {
+    $(document).mouseup(function(event) {
+	if (!$(form).is(event.target) && !$(button).is(event.target) && $(form).has(event.target).length === 0) {
+	    $(form).slideUp("fast");
+	    $(button).removeClass("btn-dark");
+	    $(button).addClass("btn-primary");
+	}
     });
 }
 
