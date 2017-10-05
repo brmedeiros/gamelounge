@@ -13,7 +13,7 @@ function codeGen(codeLength) {
     const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
     var code = '';
     for (var i = 0; i < codeLength; ++i) {
-	code += chars[Math.ceil(Math.random() * (chars.length)) - 1];
+	code += chars[Math.floor(Math.random()*chars.length)];
     }
     return code;
 }
