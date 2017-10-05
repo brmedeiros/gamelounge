@@ -41,10 +41,10 @@ function createRoom(req, res, next) {
 
 function joinRoom(req, res, next) {
     //console.log(req.body);
-    for (var game of gameRoomList){
-	if (req.body.code == game.code){
-	    game.players.push(req.body.username);
-	    res.json(game);
+    for (var gameRoom of gameRoomList){
+	if (req.body.code == gameRoom.code){
+	    gameRoom.players.push(req.body.username);
+	    res.json(gameRoom);
 
 	    console.log(gameRoomList);
 	    console.log('\n');
