@@ -39,10 +39,21 @@ function createRoom(req, res, next) {
     return next();
 }
 
+// function validateRoom(req, res, next) {
+//     for (var gameRoom of gameRoomList){
+// 	if (req.body.code == gameRoom.code){
+// 	    res.json("true");
+// 	    next();
+// 	}
+//     }
+//     res.json("false");
+//     next();
+// }
+
 function joinRoom(req, res, next) {
     //console.log(req.body);
     for (var gameRoom of gameRoomList){
-	if (req.body.code == gameRoom.code){
+    	if (req.body.code == gameRoom.code){
 	    gameRoom.players.push(req.body.username);
 	    res.json(gameRoom);
 
@@ -50,7 +61,7 @@ function joinRoom(req, res, next) {
 	    console.log('\n');
 
 	    return next();
-	}
+ 	}
     }
     return next();
 }
@@ -62,6 +73,7 @@ server.use(restify.plugins.bodyParser()); //restify handler for parsing post bod
 
 server.post('/new-room/', createRoom);
 server.post('/join-room/', joinRoom);
+//server.get('/validate-room/', validateRoom);
 
 server.get(/.*/, restify.plugins.serveStatic({
     'directory': __dirname,

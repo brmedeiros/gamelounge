@@ -20,13 +20,14 @@
     <div class="col text-center">
 	<button type="button" class="btn btn-primary btn-lg m-2" id="create-new-game-btn">Create New Game</button>
 	<!-- creator name form -->
-	<form class="form-inline justify-content-center" id="create-new-game">
-	    <div class="form-group mr-2">
-		<input type="text" class="form-control form-control-lg text-center"
-		       placeholder="Enter your name" name="username" value="">
+	<form class="justify-content-center" id="create-new-game">
+	    <div class="form-group">
+		<input type="text" class="form-control form-control-lg text-center mb-1"
+		       placeholder="Enter your name" name="username">
+		<div class="errorMsg"></div>
+		<button type="submit" class="btn btn-primary btn-lg">Create!</button>
 	    </div>
-	    <button type="submit" class="btn btn-primary btn-lg mr-2">Create!</button>
-    	</form>
+	</form>
     </div>
 </div>
 
@@ -35,14 +36,16 @@
     <div class="col text-center">
 	<button type="button" class="btn btn-primary btn-lg m-2" id="join-game-btn">Join Game</button>
 	<!-- player name form -->
-	<form  class="form-inline justify-content-center" id="join-game">
-	    <div class="form-group mr-2">
-		<input type="text" class="form-control form-control-lg text-center"
-		       placeholder="Enter your name" name="username" value="">
-		<input type="text" class="form-control form-control-lg text-center"
-		       placeholder="Enter the code" name="code" value="">
+	<form  class="justify-content-center" id="join-game">
+	    <div class="form-group">
+		<input type="text" class="form-control form-control-lg text-center mb-1"
+		       placeholder="Enter your name" name="username">
+		<div class="errorMsg"></div>
+		<input type="text" class="form-control form-control-lg text-center mb-1"
+		       placeholder="Enter the code" name="code">
+		<div class="errorMsg"></div>
+		<button type="submit" class="btn btn-primary btn-lg">Join!</button>
 	    </div>
-	    <button type="submit" class="btn btn-primary btn-lg mr-2">Join!</button>
 	</form>
     </div>
 </div>

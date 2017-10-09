@@ -22,13 +22,37 @@ function formDefaultBehavior(form, url) {
 
     $(form).submit(function(event) {
 	event.preventDefault();
-	$.post(url, $(form).serialize(),function(data){
-	    responseData = data;
-	    console.log(responseData);
-	    if (responseData) {
-		loadWaitingRoom();
-	    }
+
+	$(form).validate({
+	    rules: {
+		username: {
+		    required: true,
+		    minlength: 3
+		},
+		code: "required"
+	    },
+	    messages: {
+		username: {
+		    required: "this is required",
+		    minlength: "at least 3 characters"
+		},
+		code: "this is required"
+	    }// ,
+	    // remote: {
+	    // 	url: "/validate-room/",
+	    // 	message: "enter a valid code"
+	    // }
 	});
+
+	if ($(form).valid()){
+	    $.post(url, $(form).serialize(),function(data){
+		responseData = data;
+		console.log(responseData);
+		if (responseData) {
+		    loadWaitingRoom();
+		}
+	    });
+	}
     });
 
     $(document).mouseup(function(event) {
