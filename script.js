@@ -20,9 +20,6 @@ function formDefaultBehavior(form, url) {
 	$(form).slideToggle("fast");
     });
 
-    $(form).submit(function(event) {
-	event.preventDefault();
-
 	$(form).validate({
 	    rules: {
 		username: {
@@ -43,6 +40,9 @@ function formDefaultBehavior(form, url) {
 	    // 	message: "enter a valid code"
 	    // }
 	});
+
+    $(form).submit(function(event) {
+	event.preventDefault();
 
 	if ($(form).valid()){
 	    $.post(url, $(form).serialize(),function(data){
