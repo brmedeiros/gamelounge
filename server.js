@@ -27,6 +27,16 @@ function GameRoom(creator, code) {
 var gameRoomList = [];
 
 function createRoom(req, res, next) {
+    if (req.body == undefined) {
+	res.send(400, {errorMsg: 'please send an object with a username, e.g.:{username:john}'});
+	return next();
+    }
+
+    if (req.body.username == '' || req.body.username == undefined) {
+	res.send(422, {errorMsg: 'please send an object with a username, e.g.:{username:john}'});
+	return next();
+    }
+
     var code = codeGen(5);
     var newGameRoom  = new GameRoom(req.body.username, code);
     gameRoomList.push(newGameRoom);
@@ -52,6 +62,16 @@ function createRoom(req, res, next) {
 
 function joinRoom(req, res, next) {
     //console.log(req.body);
+    if (req.body == undefined) {
+	res.send(400, {errorMsg: 'please send an object with a code and username'});
+	return next();
+    }
+
+    if (req.body.username == '' || req.body.code == '' || req.body.username == undefined || req.body.code == undefined) {
+	res.send(422, {errorMsg: 'please send an object with a code and username'});
+	return next();
+    }
+
     for (var gameRoom of gameRoomList){
     	if (req.body.code == gameRoom.code){
 	    gameRoom.players.push(req.body.username);
@@ -63,6 +83,7 @@ function joinRoom(req, res, next) {
 	    return next();
  	}
     }
+    res.send(404, {errorMsg: 'please send a valid code'});
     return next();
 }
 
@@ -83,3 +104,5 @@ server.get(/.*/, restify.plugins.serveStatic({
 server.listen(8080, function() {
     console.log('%s listening at %s', server.name, server.url);
 });
+
+module.exports = server;
