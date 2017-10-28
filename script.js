@@ -45,7 +45,7 @@ function formDefaultBehavior(form, url) {
 	event.preventDefault();
 
 	if ($(form).valid()){
-	    $.post(url, $(form).serialize(),function(data){
+	    $.post(url, $(form).serialize(), function(data){
 		responseData = data;
 		console.log(responseData);
 		if (responseData) {
