@@ -77,16 +77,24 @@ function joinRoom(req, res, next) {
 }
 
 function validateRoom(req, res, next) {
-    //console.log(req.body.code);
+    if (req.body == undefined) {
+	res.send(400, {errorMsg: 'please send an object with a valid code'});
+	return next();
+    }
+
+    if (req.body.code == '' || req.body.code == undefined) {
+	res.send(422, {errorMsg: 'please send an object with a valid code'});
+	return next();
+	}
+
     for (var gameRoom of gameRoomList){
 	if (req.body.code == gameRoom.code){
 	    res.json("true");
-	    next();
-	    return; //this terminates the handler and avoids an error when submitting the form
+	    return next();
 	}
     }
     res.json('enter a valid code'); //invalid form msg
-    next();
+    return next();
 }
 
 var server = restify.createServer({name: 'Game Lounge'});

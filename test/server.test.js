@@ -168,40 +168,65 @@ describe('server', function() {
     });
 
     it('should validate a correct game code', function(done) {
-    	var gameCode;
-    	chai.request(server)
-    	    .post('/new-room')
-    	    .send({username: 'jonh'})
-    	    .end(function(err, res){
-    		gameCode = res.body.code;
-    		chai.request(server)
-    		    .post('/validate-room')
-    		    .send({code: gameCode})
-    		    .end(function(err, res) {
-    			res.should.have.status(200);
-    			res.body.should.be.a('string');
-    			res.body.should.be.equal('true');
-    			done();
-    		    });
+	var gameCode;
+	chai.request(server)
+	    .post('/new-room')
+	    .send({username: 'jonh'})
+	    .end(function(err, res){
+		gameCode = res.body.code;
+		chai.request(server)
+		    .post('/validate-room')
+		    .send({code: gameCode})
+		    .end(function(err, res) {
+			res.should.have.status(200);
+			res.body.should.be.a('string');
+			res.body.should.be.equal('true');
+			done();
+		    });
 	    });
     });
 
     it('should not validate a incorrect game code', function(done) {
-    	var gameCode;
-    	chai.request(server)
-    	    .post('/new-room')
-    	    .send({username: 'jonh'})
-    	    .end(function(err, res){
-    		gameCode = res.body.code;
-    		chai.request(server)
-    		    .post('/validate-room')
-    		    .send({code: gameCode + 'z'})
-    		    .end(function(err, res) {
-    			res.should.have.status(200);
-    			res.body.should.be.a('string');
-    			res.body.should.be.equal('enter a valid code');
-    			done();
-    		    });
+	var gameCode;
+	chai.request(server)
+	    .post('/new-room')
+	    .send({username: 'jonh'})
+	    .end(function(err, res){
+		gameCode = res.body.code;
+		chai.request(server)
+		    .post('/validate-room')
+		    .send({code: gameCode + 'z'})
+		    .end(function(err, res) {
+			res.should.have.status(200);
+			res.body.should.be.a('string');
+			res.body.should.be.equal('enter a valid code');
+			done();
+		    });
+	    });
+    });
+
+    it('should respond with 400 when there no code sent for remote validation', function(done) {
+	chai.request(server)
+	    .post('/validate-room')
+	    .end(function(err, res) {
+		res.should.have.status(400);
+		res.body.should.be.a('object');
+		res.body.should.have.property('errorMsg')
+		    .equal('please send an object with a valid code');
+		done();
+	    });
+    });
+
+    it('should respond with 422 when the code sent for remote validation is empty', function(done) {
+	chai.request(server)
+	    .post('/validate-room')
+	    .send({code: ''})
+	    .end(function(err, res) {
+		res.should.have.status(422);
+		res.body.should.be.a('object');
+		res.body.should.have.property('errorMsg')
+		    .equal('please send an object with a valid code');
+		done();
 	    });
     });
 
