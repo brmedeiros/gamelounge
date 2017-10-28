@@ -167,4 +167,42 @@ describe('server', function() {
 	    });
     });
 
+    it('should validate a correct game code', function(done) {
+    	var gameCode;
+    	chai.request(server)
+    	    .post('/new-room')
+    	    .send({username: 'jonh'})
+    	    .end(function(err, res){
+    		gameCode = res.body.code;
+    		chai.request(server)
+    		    .post('/validate-room')
+    		    .send({code: gameCode})
+    		    .end(function(err, res) {
+    			res.should.have.status(200);
+    			res.body.should.be.a('string');
+    			res.body.should.be.equal('true');
+    			done();
+    		    });
+	    });
+    });
+
+    it('should not validate a incorrect game code', function(done) {
+    	var gameCode;
+    	chai.request(server)
+    	    .post('/new-room')
+    	    .send({username: 'jonh'})
+    	    .end(function(err, res){
+    		gameCode = res.body.code;
+    		chai.request(server)
+    		    .post('/validate-room')
+    		    .send({code: gameCode + 'z'})
+    		    .end(function(err, res) {
+    			res.should.have.status(200);
+    			res.body.should.be.a('string');
+    			res.body.should.be.equal('enter a valid code');
+    			done();
+    		    });
+	    });
+    });
+
 });

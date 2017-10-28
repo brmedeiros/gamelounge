@@ -37,7 +37,7 @@ function createRoom(req, res, next) {
 	return next();
     }
 
-    var code = codeGen(5);
+    var code = codeGen(6);
     var newGameRoom  = new GameRoom(req.body.username, code);
     gameRoomList.push(newGameRoom);
     res.json(newGameRoom);
@@ -77,7 +77,7 @@ function joinRoom(req, res, next) {
 }
 
 function validateRoom(req, res, next) {
-    console.log(req.body.code);
+    //console.log(req.body.code);
     for (var gameRoom of gameRoomList){
 	if (req.body.code == gameRoom.code){
 	    res.json("true");
@@ -85,7 +85,7 @@ function validateRoom(req, res, next) {
 	    return; //this terminates the handler and avoids an error when submitting the form
 	}
     }
-    res.json("enter a valid code");
+    res.json('enter a valid code'); //invalid form msg
     next();
 }
 
