@@ -20,26 +20,36 @@ function formDefaultBehavior(form, url) {
 	$(form).slideToggle("fast");
     });
 
-	$(form).validate({
-	    rules: {
-		username: {
-		    required: true,
-		    minlength: 3
-		},
-		code: "required"
+    $(form).validate({
+	onkeyup: false,
+	rules: {
+	    username: {
+		required: true,
+		minlength: 3
 	    },
-	    messages: {
-		username: {
-		    required: "this is required",
-		    minlength: "at least 3 characters"
-		},
-		code: "this is required"
-	    }// ,
-	    // remote: {
-	    // 	url: "/validate-room/",
-	    // 	message: "enter a valid code"
-	    // }
-	});
+	    code: {
+		required: true,
+		remote: {
+		    url: "/validate-room/",
+		    type: "post",
+		    data: {
+			code: function() {
+			    return $(form + " input[name=code]").val();
+			}
+		    }
+	    	}
+	    }
+	},
+	messages: {
+	    username: {
+		required: "this is required",
+		minlength: "at least 3 characters"
+	    },
+	    code: {
+		required: "this is required"
+	    }
+	}
+    });
 
     $(form).submit(function(event) {
 	event.preventDefault();

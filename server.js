@@ -49,17 +49,6 @@ function createRoom(req, res, next) {
     return next();
 }
 
-// function validateRoom(req, res, next) {
-//     for (var gameRoom of gameRoomList){
-// 	if (req.body.code == gameRoom.code){
-// 	    res.json("true");
-// 	    next();
-// 	}
-//     }
-//     res.json("false");
-//     next();
-// }
-
 function joinRoom(req, res, next) {
     //console.log(req.body);
     if (req.body == undefined) {
@@ -87,6 +76,19 @@ function joinRoom(req, res, next) {
     return next();
 }
 
+function validateRoom(req, res, next) {
+    console.log(req.body.code);
+    for (var gameRoom of gameRoomList){
+	if (req.body.code == gameRoom.code){
+	    res.json("true");
+	    next();
+	    return; //this terminates the handler and avoids an error when submitting the form
+	}
+    }
+    res.json("enter a valid code");
+    next();
+}
+
 var server = restify.createServer({name: 'Game Lounge'});
 server.use(CookieParser.parse); //restify cookie handler
 server.use(checkCookie); //our handler for verifying/creating cookies
@@ -94,7 +96,7 @@ server.use(restify.plugins.bodyParser()); //restify handler for parsing post bod
 
 server.post('/new-room/', createRoom);
 server.post('/join-room/', joinRoom);
-//server.get('/validate-room/', validateRoom);
+server.post('/validate-room/', validateRoom);
 
 server.get(/.*/, restify.plugins.serveStatic({
     'directory': __dirname,
