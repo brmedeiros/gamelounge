@@ -175,7 +175,7 @@ describe('server', function() {
 	    .end(function(err, res){
 		gameCode = res.body.code;
 		chai.request(server)
-		    .post('/validate-room')
+		    .post('/validate-code')
 		    .send({code: gameCode})
 		    .end(function(err, res) {
 			res.should.have.status(200);
@@ -194,7 +194,7 @@ describe('server', function() {
 	    .end(function(err, res){
 		gameCode = res.body.code;
 		chai.request(server)
-		    .post('/validate-room')
+		    .post('/validate-code')
 		    .send({code: gameCode + 'z'})
 		    .end(function(err, res) {
 			res.should.have.status(200);
@@ -207,7 +207,7 @@ describe('server', function() {
 
     it('should respond with 400 when there no code sent for remote validation', function(done) {
 	chai.request(server)
-	    .post('/validate-room')
+	    .post('/validate-code')
 	    .end(function(err, res) {
 		res.should.have.status(400);
 		res.body.should.be.a('object');
@@ -219,7 +219,7 @@ describe('server', function() {
 
     it('should respond with 422 when the code sent for remote validation is empty', function(done) {
 	chai.request(server)
-	    .post('/validate-room')
+	    .post('/validate-code')
 	    .send({code: ''})
 	    .end(function(err, res) {
 		res.should.have.status(422);

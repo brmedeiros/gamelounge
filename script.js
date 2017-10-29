@@ -22,6 +22,8 @@ function formDefaultBehavior(form, url) {
 
     $(form).validate({
 	onkeyup: false,
+	onfocusout: false,
+
 	rules: {
 	    username: {
 		required: true,
@@ -30,16 +32,17 @@ function formDefaultBehavior(form, url) {
 	    code: {
 		required: true,
 		remote: {
-		    url: "/validate-room/",
+		    url: "/validate-code/",
 		    type: "post",
 		    data: {
-			code: function() {
-			    return $(form + " input[name=code]").val();
-			}
+		    	code: function() {
+		    	    return $(form + " input[name=code]").val();
+		    	}
 		    }
 	    	}
 	    }
 	},
+
 	messages: {
 	    username: {
 		required: "this is required",
@@ -48,13 +51,9 @@ function formDefaultBehavior(form, url) {
 	    code: {
 		required: "this is required"
 	    }
-	}
-    });
+	},
 
-    $(form).submit(function(event) {
-	event.preventDefault();
-
-	if ($(form).valid()){
+	submitHandler: function() {
 	    $.post(url, $(form).serialize(), function(data){
 		responseData = data;
 		console.log(responseData);
@@ -63,6 +62,7 @@ function formDefaultBehavior(form, url) {
 		}
 	    });
 	}
+
     });
 
     $(document).mouseup(function(event) {
