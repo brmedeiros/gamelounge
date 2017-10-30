@@ -7,8 +7,8 @@ $(function() {
 
 function loadHome() {
     $("#root").hide().load("home.part.html", function() {
-	formDefaultBehavior("#create-new-game", "/new-room");
-	formDefaultBehavior("#join-game", "/join-room");
+	formDefaultBehavior("#create-new-game", "/create-room/");
+	formDefaultBehavior("#join-game", "/join-room/");
     }).fadeIn('slow');
 }
 
@@ -27,7 +27,19 @@ function formDefaultBehavior(form, url) {
 	rules: {
 	    username: {
 		required: true,
-		minlength: 3
+		minlength: 3,
+		remote: {
+		    url: "/validate-username/",
+		    type: "post",
+		    data: {
+			username: function() {
+			    return $(form + " input[name=username]").val();
+			},
+			code: function() {
+			    return $(form + " input[name=code]").val();
+			}
+		    }
+		}
 	    },
 	    code: {
 		required: true,
@@ -35,11 +47,11 @@ function formDefaultBehavior(form, url) {
 		    url: "/validate-code/",
 		    type: "post",
 		    data: {
-		    	code: function() {
-		    	    return $(form + " input[name=code]").val();
-		    	}
+			code: function() {
+			    return $(form + " input[name=code]").val();
+			}
 		    }
-	    	}
+		}
 	    }
 	},
 
@@ -80,9 +92,9 @@ function loadWaitingRoom() {
 	if (joinOrCreate == "create-new-game-btn") {
 	    $("#join-waiting").remove();
 	    $("#code").text(responseData['code']);
-     	} else if (joinOrCreate == "join-game-btn") {
+	} else if (joinOrCreate == "join-game-btn") {
 	    $("#game-code").remove();
- 	    $("#start-game").remove();
+	    $("#start-game").remove();
 	    $("#creator-name").text(responseData['creator'] + "'s game");
 	}
     }).fadeIn('slow');

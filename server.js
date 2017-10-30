@@ -89,7 +89,7 @@ function validateCode(req, res, next) {
 
     for (var gameRoom of gameRoomList){
 	if (req.body.code == gameRoom.code){
-	    res.json("true");
+	    res.json('true');
 	    return next();
 	}
     }
@@ -97,42 +97,49 @@ function validateCode(req, res, next) {
     return next();
 }
 
-// function validateUserName(req, res, next) {
-//     if (req.body == undefined) {
-// 	res.send(400, {errorMsg: 'please send an object with a valid username'});
-// 	return next();
-//     }
+function validateUsername(req, res, next) {
+    if (req.body == undefined) {
+	res.send(400, {errorMsg: 'please send an object with a valid username'});
+	return next();
+    }
 
-//     if (req.body.username == '' || req.body.username == undefined) {
-// 	res.send(422, {errorMsg: 'please send an object with a valid username'});
-// 	return next();
-// 	}
+    if (req.body.username == '' || req.body.username == undefined) {
+	res.send(422, {errorMsg: 'please send an object with a valid username'});
+	return next();
+	}
 
-//     if (!req.body.code) {
-// 	res.json("true");
-// 	return next();
-//     } else {
-// 	for (var gameRoom of gameRoomList){
-// 	    if (req.body.code == gameRoom.code){
-// 		for (var username of gameRoom.players)
-// 		    if req.body.username
-// 		res.json("true");
-// 		return next();
-// 	    }
-// 	}
-//     }
-//     res.json('enter a valid code'); //invalid form msg
-//     return next();
-// }
+    if (req.body.code == '' || req.body.code == undefined) {
+	res.json('true');
+	return next();
+    } else {
+	for (var gameRoom of gameRoomList){
+	    if (req.body.code == gameRoom.code){
+		for (var player of gameRoom.players) {
+		    if (req.body.username == player) {
+			res.json('name already in use'); //invalid form msg
+			return next();
+		    } else {
+			res.json('true');
+			return next();
+		    }
+		}
+	    } else {
+		res.json('true');
+		return next();
+	    }
+	}
+    }
+}
 
 var server = restify.createServer({name: 'Game Lounge'});
 server.use(CookieParser.parse); //restify cookie handler
 server.use(checkCookie); //our handler for verifying/creating cookies
 server.use(restify.plugins.bodyParser()); //restify handler for parsing post body params
 
-server.post('/new-room/', createRoom);
+server.post('/create-room/', createRoom);
 server.post('/join-room/', joinRoom);
 server.post('/validate-code/', validateCode);
+server.post('/validate-username/', validateUsername);
 
 server.get(/.*/, restify.plugins.serveStatic({
     'directory': __dirname,
