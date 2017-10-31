@@ -237,11 +237,89 @@ describe('server', function() {
     });
 
     describe('validateUsername', function() {
-	it('should validate any name when creating a room', function() {});
-	it('should validate a name when no code is provided while trying to join a room', function() {});
-	it('should validate a name when an invalid code is provided while trying to join a room', function() {});
-	it('should not validate a name equal to the game creator when joining a room', function() {});
-	it('should not validate a name already in use by any of the players in the room when trying to join it', function() {});
+	it('should validate a name when no code is provided while trying to join a room', function(done) {
+	    var userName;
+	    chai.request(server)
+		.post('/create-room/')
+		.send({username: 'mike'})
+		.end(function(err, res){
+		    userName = res.body.creator;
+		    chai.request(server)
+			.post('/validate-username/')
+			.send({username: userName})
+			.end(function(err, res){
+			    res.should.have.status(200);
+			    res.body.should.be.a('string');
+			    res.body.should.equal('true');
+			    done();
+			});
+		});
+	});
+	it('should validate a name when an invalid code is provided while trying to join a room', function(done) {
+	    var userName;
+	    var gameCode;
+	    chai.request(server)
+		.post('/create-room/')
+		.send({username: 'mike'})
+		.end(function(err, res){
+		    userName = res.body.creator;
+		    gameCode = res.body.code + 'a';
+		    chai.request(server)
+			.post('/validate-username/')
+			.send({username: userName})
+			.end(function(err, res){
+			    res.should.have.status(200);
+			    res.body.should.be.a('string');
+			    res.body.should.equal('true');
+			    done();
+			});
+		});
+	});
+	it('should not validate a name equal to the game creator when joining a room', function(done) {
+	    var userName;
+	    var gameCode;
+	    chai.request(server)
+		.post('/create-room/')
+		.send({username: 'mike'})
+		.end(function(err, res){
+		    userName = res.body.creator;
+		    gameCode = res.body.code;
+		    chai.request(server)
+			.post('/validate-username/')
+			.send({username: userName,
+			       code: gameCode})
+			.end(function(err, res){
+			    res.should.have.status(200);
+			    res.body.should.be.a('string');
+			    res.body.should.equal('name already in use');
+			    done();
+			});
+		});
+	});
+	it('should not validate a name already in use by any of the players in the room when trying to join it', function(done) {
+	    var gameCode;
+	    chai.request(server)
+		.post('/create-room/')
+		.send({username: 'mike'})
+		.end(function(err, res){
+		    gameCode = res.body.code;
+		    chai.request(server)
+			.post('/join-room/')
+			.send({username: 'wike',
+			       code: gameCode})
+			.end(function(err, res){
+			    chai.request(server)
+				.post('/validate-username/')
+				.send({username: 'wike',
+				       code: gameCode})
+				.end(function(err, res){
+				    res.should.have.status(200);
+				    res.body.should.be.a('string');
+				    res.body.should.equal('name already in use');
+				    done();
+				});
+			});
+		});
+	});
     });
-
 });

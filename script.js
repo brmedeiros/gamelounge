@@ -7,12 +7,16 @@ $(function() {
 
 function loadHome() {
     $("#root").hide().load("home.part.html", function() {
-	formDefaultBehavior("#create-new-game", "/create-room/");
-	formDefaultBehavior("#join-game", "/join-room/");
+	formDefaultBehavior("#create-new-game", "/create-room/", {username: {
+		required: true,
+		minlength: 3}});
+	formDefaultBehavior("#join-game", "/join-room/", {
+	    username: { url: '/validate-username', required: true, minlength: 3},
+	    code: { url: '/validate-code/', required: true}});
     }).fadeIn('slow');
 }
 
-function formDefaultBehavior(form, url) {
+function formDefaultBehavior(form, url, rules) {
     $(form).hide();
     $(form + "-btn").click(function() {
 	joinOrCreate = this.id;
@@ -20,40 +24,32 @@ function formDefaultBehavior(form, url) {
 	$(form).slideToggle("fast");
     });
 
+    var validationRules = {};
+
+    for (var field in rules) {
+	validationRules[field] = {};
+	validationRules[field]['required'] = rules[field]['required'] || false;
+	if (rules[field]['minlength']) {
+	    validationRules[field]['minlength'] = rules[field]['minlength'];
+	}
+	if (rules[field]['url']) {
+	    validationRules[field]['remote'] = {
+		url: rules[field]['url'],
+		type: "post",
+		data: {
+		    code: function() {
+			return $(form + " input[name=" + field + "]").val();
+		    }
+		}
+	    };
+	}
+    }
+
     $(form).validate({
 	onkeyup: false,
 	onfocusout: false,
 
-	rules: {
-	    username: {
-		required: true,
-		minlength: 3,
-		remote: {
-		    url: "/validate-username/",
-		    type: "post",
-		    data: {
-			username: function() {
-			    return $(form + " input[name=username]").val();
-			},
-			code: function() {
-			    return $(form + " input[name=code]").val();
-			}
-		    }
-		}
-	    },
-	    code: {
-		required: true,
-		remote: {
-		    url: "/validate-code/",
-		    type: "post",
-		    data: {
-			code: function() {
-			    return $(form + " input[name=code]").val();
-			}
-		    }
-		}
-	    }
-	},
+	rules: validationRules,
 
 	messages: {
 	    username: {

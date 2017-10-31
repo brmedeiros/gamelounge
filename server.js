@@ -106,29 +106,16 @@ function validateUsername(req, res, next) {
     if (req.body.username == '' || req.body.username == undefined) {
 	res.send(422, {errorMsg: 'please send an object with a valid username'});
 	return next();
-	}
+    }
 
-    if (req.body.code == '' || req.body.code == undefined) {
-	res.json('true');
-	return next();
-    } else {
-	for (var gameRoom of gameRoomList){
-	    if (req.body.code == gameRoom.code){
-		for (var player of gameRoom.players) {
-		    if (req.body.username == player) {
-			res.json('name already in use'); //invalid form msg
-			return next();
-		    } else {
-			res.json('true');
-			return next();
-		    }
-		}
-	    } else {
-		res.json('true');
-		return next();
-	    }
+    for (var gameRoom of gameRoomList) {
+	if (req.body.code == gameRoom.code && gameRoom.players.includes(req.body.username)) {
+	    res.json('name already in use');
+	    return next();
 	}
     }
+    res.json('true');
+    return next();
 }
 
 var server = restify.createServer({name: 'Game Lounge'});
