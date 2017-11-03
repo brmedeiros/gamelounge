@@ -24,7 +24,7 @@ function GameRoom(creator, code) {
     this.players = [creator];
 }
 
-var gameRoomList = [];
+var gameRoomList = {};
 
 function createRoom(req, res, next) {
     if (req.body == undefined) {
@@ -39,10 +39,9 @@ function createRoom(req, res, next) {
 
     var code = codeGen(5);
     var newGameRoom  = new GameRoom(req.body.username, code);
-    gameRoomList.push(newGameRoom);
+    gameRoomList[code] = newGameRoom;
     res.json(newGameRoom);
 
-    //console.log(req.body);
     //console.log(gameRoomList);
     //console.log('\n');
 
@@ -50,7 +49,6 @@ function createRoom(req, res, next) {
 }
 
 function joinRoom(req, res, next) {
-    //console.log(req.body);
     if (req.body == undefined) {
 	res.send(400, {errorMsg: 'please send an object with a code and username'});
 	return next();
@@ -61,17 +59,16 @@ function joinRoom(req, res, next) {
 	return next();
     }
 
-    for (var gameRoom of gameRoomList){
-    	if (req.body.code == gameRoom.code){
-	    gameRoom.players.push(req.body.username);
-	    res.json(gameRoom);
+    if (req.body.code in gameRoomList) {
+	gameRoomList[req.body.code].players.push(req.body.username);
+	res.json(gameRoomList[req.body.code]);
 
-	    //console.log(gameRoomList);
-	    //console.log('\n');
+	//console.log(gameRoomList);
+	//console.log('\n');
 
-	    return next();
- 	}
+	return next();
     }
+
     res.send(404, {errorMsg: 'please send a valid code'});
     return next();
 }
@@ -87,12 +84,11 @@ function validateCode(req, res, next) {
 	return next();
 	}
 
-    for (var gameRoom of gameRoomList){
-	if (req.body.code == gameRoom.code){
-	    res.json('true');
-	    return next();
-	}
+    if (req.body.code in gameRoomList) {
+	res.json('true');
+	return next();
     }
+
     res.json('enter a valid code'); //invalid form msg
     return next();
 }
@@ -108,12 +104,11 @@ function validateUsername(req, res, next) {
 	return next();
     }
 
-    for (var gameRoom of gameRoomList) {
-	if (req.body.code == gameRoom.code && gameRoom.players.includes(req.body.username)) {
-	    res.json('name already in use');
-	    return next();
-	}
+    if (req.body.code in gameRoomList && gameRoomList[req.body.code].players.includes(req.body.username)) {
+	res.json('name already in use');
+	return next();
     }
+
     res.json('true');
     return next();
 }
