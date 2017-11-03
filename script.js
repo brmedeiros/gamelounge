@@ -7,12 +7,13 @@ $(function() {
 
 function loadHome() {
     $("#root").hide().load("home.part.html", function() {
-	formDefaultBehavior("#create-new-game", "/create-room/", {username: {
-		required: true,
-		minlength: 3}});
+	formDefaultBehavior("#create-new-game", "/create-room/", {
+	    username: {required: true, minlength: 3}
+	});
 	formDefaultBehavior("#join-game", "/join-room/", {
-	    username: { url: '/validate-username', required: true, minlength: 3},
-	    code: { url: '/validate-code/', required: true}});
+	    username: {required: true, minlength: 3, url: '/validate-username'},
+	    code: {required: true, url: '/validate-code/'}
+	});
     }).fadeIn('slow');
 }
 
