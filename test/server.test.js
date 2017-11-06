@@ -8,12 +8,13 @@ chai.use(chaiHttp);
 describe('server', function() {
 
     after(function() {
-	server.close();
+	server.restifyServer.close();
+	server.redisClient.quit();
     });
 
     describe('createRoom', function() {
 	it('should create a game room with the correct request', function(done) {
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res) {
@@ -22,14 +23,14 @@ describe('server', function() {
 		    res.body.should.have.property('code');
 		    res.body.should.have.property('creator').equal('jonh');
 		    res.body.should.have.property('players');
-		    res.body.players.should.be.a('array');
+		    res.body.players.should.be.a('string');
 		    res.body.players.should.contain('jonh');
 		    done();
 		});
 	});
 
 	it('should respond with error 400 when the post is empty', function(done) {
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.end(function(err, res) {
 		    res.should.have.status(400);//bad request
@@ -41,7 +42,7 @@ describe('server', function() {
 	});
 
 	it('should respond with error 422 when the post has a blank username', function(done){
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: ''})
 		.end(function(err, res) {
@@ -57,12 +58,12 @@ describe('server', function() {
     describe('joinRoom', function() {
 	it('should add a player to previously created room', function(done){
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res) {
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/join-room')
 			.send({code: gameCode,
 			       username: 'mike'})
@@ -72,7 +73,7 @@ describe('server', function() {
 			    res.body.should.have.property('code');
 			    res.body.should.have.property('creator').equal('jonh');
 			    res.body.should.have.property('players');
-			    res.body.players.should.be.a('array');
+			    res.body.players.should.be.a('string');
 			    res.body.players.should.contains('jonh', 'mike');
 			    done();
 			});
@@ -81,7 +82,7 @@ describe('server', function() {
 	});
 
 	it('should respond with 404 when trying to access a room that does not exist', function(done){
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/join-room')
 		.send({code: 'tt404',
 		       username: 'mike'})
@@ -95,7 +96,7 @@ describe('server', function() {
 	});
 
 	it('should respond with 400 when the post is empty', function(done){
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/join-room')
 		.end(function(err, res) {
 		    res.should.have.status(400);
@@ -108,12 +109,12 @@ describe('server', function() {
 
 	it('should respond with 422 when the username is blank', function(done){
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res) {
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/join-room')
 			.send({code: gameCode,
 			       username: ''})
@@ -130,12 +131,12 @@ describe('server', function() {
 
 	it('should respond with 422 when the code is blank', function(done){
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res) {
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/join-room')
 			.send({code: '',
 			       username: 'mike'})
@@ -151,12 +152,12 @@ describe('server', function() {
 
 	it('should respond with 422 the request object does not contain username or code properties', function(done){
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res) {
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/join-room')
 			.send({a: '1',
 			       b: '2'})
@@ -174,12 +175,12 @@ describe('server', function() {
     describe('validateCode', function() {
 	it('should validate a correct game code', function(done) {
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res){
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/validate-code')
 			.send({code: gameCode})
 			.end(function(err, res) {
@@ -193,12 +194,12 @@ describe('server', function() {
 
 	it('should not validate a incorrect game code', function(done) {
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'jonh'})
 		.end(function(err, res){
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/validate-code')
 			.send({code: gameCode + 'z'})
 			.end(function(err, res) {
@@ -211,7 +212,7 @@ describe('server', function() {
 	});
 
 	it('should respond with 400 when the validation post is empty', function(done) {
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/validate-code')
 		.end(function(err, res) {
 		    res.should.have.status(400);
@@ -223,7 +224,7 @@ describe('server', function() {
 	});
 
 	it('should respond with 422 when the code sent for remote validation is empty', function(done) {
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/validate-code')
 		.send({code: ''})
 		.end(function(err, res) {
@@ -239,12 +240,12 @@ describe('server', function() {
     describe('validateUsername', function() {
 	it('should validate a name when no code is provided while trying to join a room', function(done) {
 	    var userName;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'mike'})
 		.end(function(err, res){
 		    userName = res.body.creator;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/validate-username')
 			.send({username: userName})
 			.end(function(err, res){
@@ -258,13 +259,13 @@ describe('server', function() {
 	it('should validate a name when an invalid code is provided while trying to join a room', function(done) {
 	    var userName;
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'mike'})
 		.end(function(err, res){
 		    userName = res.body.creator;
 		    gameCode = res.body.code + 'a';
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/validate-username')
 			.send({username: userName})
 			.end(function(err, res){
@@ -278,13 +279,13 @@ describe('server', function() {
 	it('should not validate a name equal to the game creator when joining a room', function(done) {
 	    var userName;
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'mike'})
 		.end(function(err, res){
 		    userName = res.body.creator;
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/validate-username')
 			.send({username: userName,
 			       code: gameCode})
@@ -298,17 +299,17 @@ describe('server', function() {
 	});
 	it('should not validate a name already in use by any of the players in the room when trying to join it', function(done) {
 	    var gameCode;
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/create-room')
 		.send({username: 'mike'})
 		.end(function(err, res){
 		    gameCode = res.body.code;
-		    chai.request(server)
+		    chai.request(server.restifyServer)
 			.post('/join-room')
 			.send({username: 'wike',
 			       code: gameCode})
 			.end(function(err, res){
-			    chai.request(server)
+			    chai.request(server.restifyServer)
 				.post('/validate-username')
 				.send({username: 'wike',
 				       code: gameCode})
@@ -323,7 +324,7 @@ describe('server', function() {
 	});
 
 	it('should respond with 400 when the validation post is empty', function(done) {
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/validate-username')
 		.end(function(err, res) {
 		    res.should.have.status(400);
@@ -335,7 +336,7 @@ describe('server', function() {
 	});
 
 	it('should respond with 422 when the username sent for remote validation is empty', function(done) {
-	    chai.request(server)
+	    chai.request(server.restifyServer)
 		.post('/validate-username')
 		.send({username: ''})
 		.end(function(err, res) {

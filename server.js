@@ -1,5 +1,6 @@
 var restify = require('restify');
 var CookieParser = require('restify-cookies');
+var redis = require("redis");
 const uuidv4 = require('uuid/v4');
 
 function checkCookie(req, res, next) {
@@ -21,10 +22,11 @@ function codeGen(codeLength) {
 function GameRoom(creator, code) {
     this.code = code;
     this.creator = creator;
-    this.players = [creator];
+    //this.players = [creator];
+    this.players = JSON.stringify([creator]);
 }
 
-var gameRoomList = {};
+//var gameRoomList = {};
 
 function createRoom(req, res, next) {
     if (req.body == undefined) {
@@ -39,13 +41,17 @@ function createRoom(req, res, next) {
 
     var code = codeGen(5);
     var newGameRoom  = new GameRoom(req.body.username, code);
-    gameRoomList[code] = newGameRoom;
-    res.json(newGameRoom);
 
-    //console.log(gameRoomList);
-    //console.log('\n');
+    //gameRoomList[code] = newGameRoom;
 
-    return next();
+    client.hmset(code, newGameRoom, function(err, reply) {
+	if (err) {
+	    console.log(err);
+	    return next(err);
+	}
+	res.json(newGameRoom);
+	return next();
+    });
 }
 
 function joinRoom(req, res, next) {
@@ -59,18 +65,37 @@ function joinRoom(req, res, next) {
 	return next();
     }
 
-    if (req.body.code in gameRoomList) {
-	gameRoomList[req.body.code].players.push(req.body.username);
-	res.json(gameRoomList[req.body.code]);
+    // if (req.body.code in gameRoomList) {
+    // 	gameRoomList[req.body.code].players.push(req.body.username);
+    // 	res.json(gameRoomList[req.body.code]);
+    // 	return next();
+    // }
 
-	//console.log(gameRoomList);
-	//console.log('\n');
+    // res.send(404, {errorMsg: 'please send a valid code'});
+    // return next();
 
-	return next();
-    }
-
-    res.send(404, {errorMsg: 'please send a valid code'});
-    return next();
+    client.hgetall(req.body.code, function(err, reply) {
+	if(err) {
+	    console.log(err);
+	    return next(err);
+	}
+	if(reply) {
+	    reply.players = JSON.parse(reply.players);
+	    reply.players.push(req.body.username);
+	    reply.players = JSON.stringify(reply.players);
+	    client.hmset(req.body.code, reply, function() {
+		if(err) {
+		    console.log(err);
+		    return next(err);
+		}
+		res.json(reply);
+		return next();
+	    });
+	} else {
+	    res.send(404, {errorMsg: 'please send a valid code'});
+	    return next();
+	}
+    });
 }
 
 function validateCode(req, res, next) {
@@ -84,13 +109,24 @@ function validateCode(req, res, next) {
 	return next();
 	}
 
-    if (req.body.code in gameRoomList) {
-	res.json('true');
-	return next();
-    }
+    // if (req.body.code in gameRoomList) {
+    // 	res.json('true');
+    // 	return next();
+    // }
 
-    res.json('enter a valid code'); //invalid form msg
-    return next();
+    // res.json('enter a valid code'); //invalid form msg
+    // return next();
+
+    client.hgetall(req.body.code, function (err, reply){
+	if (reply){
+	    res.json('true');
+    	    return next();
+	} else {
+	    res.json('enter a valid code'); //invalid form msg
+    	    return next();
+	}
+    });
+
 }
 
 function validateUsername(req, res, next) {
@@ -104,24 +140,43 @@ function validateUsername(req, res, next) {
 	return next();
     }
 
-    if (req.body.code in gameRoomList && gameRoomList[req.body.code].players.includes(req.body.username)) {
-	res.json('name already in use');
-	return next();
-    }
+    // if (req.body.code in gameRoomList && gameRoomList[req.body.code].players.includes(req.body.username)) {
+    // 	res.json('name already in use');
+    // 	return next();
+    // }
 
-    res.json('true');
-    return next();
+    // res.json('true');
+    // return next();
+
+    client.hgetall(req.body.code, function (err, reply){
+	if (reply && JSON.parse(reply.players).includes(req.body.username)){
+	    res.json('name already in use');
+    	    return next();
+	}
+	res.json('true');
+	return next();
+    });
 }
 
 var server = restify.createServer({name: 'Game Lounge'});
+var client = redis.createClient({host: 'localhost', port: 6379});
+
+client.on('connect', function() {
+    console.log('Redis ready');
+});
+
+client.on('error', function() {
+    console.log('Redis error');
+});
+
 server.use(CookieParser.parse); //restify cookie handler
 server.use(checkCookie); //our handler for verifying/creating cookies
 server.use(restify.plugins.bodyParser()); //restify handler for parsing post body params
 
-server.post('/create-room/', createRoom);
-server.post('/join-room/', joinRoom);
-server.post('/validate-code/', validateCode);
-server.post('/validate-username/', validateUsername);
+server.post('/create-room', createRoom);
+server.post('/join-room', joinRoom);
+server.post('/validate-code', validateCode);
+server.post('/validate-username', validateUsername);
 
 server.get(/.*/, restify.plugins.serveStatic({
     'directory': __dirname,
@@ -132,4 +187,8 @@ server.listen(8080, function() {
     console.log('%s listening at %s', server.name, server.url);
 });
 
-module.exports = server;
+module.exports = {
+    restifyServer: server,
+    redisClient: client
+};
+//module.exports.client = client;
