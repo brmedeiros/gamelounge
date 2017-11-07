@@ -44,6 +44,9 @@ function createRoom(req, res, next) {
 
     //gameRoomList[code] = newGameRoom;
 
+    //gameRoomService.save(newGameRoom);
+    //return next();
+
     client.hmset(code, newGameRoom, function(err, reply) {
 	if (err) {
 	    console.log(err);
