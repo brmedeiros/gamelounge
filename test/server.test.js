@@ -12,6 +12,10 @@ describe('server', function() {
 	server.redisClient.quit();
     });
 
+    afterEach(function() {
+    	//server.redisClient.flushdb();
+    });
+
     describe('createRoom', function() {
 	it('should create a game room with the correct request', function(done) {
 	    chai.request(server.restifyServer)
@@ -192,7 +196,7 @@ describe('server', function() {
 		});
 	});
 
-	it('should not validate a incorrect game code', function(done) {
+	it('should not validate an incorrect game code', function(done) {
 	    var gameCode;
 	    chai.request(server.restifyServer)
 		.post('/create-room')
