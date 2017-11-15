@@ -16,15 +16,26 @@ GameRoomService.prototype.parse = function(gameRoomSerialized) {
     return gameRoomSerializedCopy;
 };
 
-GameRoomService.prototype.save = function(gameRoomSerialized) {
-    this.redisClient.hmset(gameRoomSerialized.code, gameRoomSerialized, function(err, reply) {
-	if(err) {
-	    return 'KO';
-	} else {
-	    console.log(reply);
-	    return reply;
-	}
-    });
+GameRoomService.prototype.save = function(gameRoom) {
+    var gameRoomCopy = Object.assign({}, gameRoom);
+    gameRoomCopy = this.serialize(gameRoom);
+    this.redisClient.hmsetAsync(gameRoomCopy.code, gameRoomCopy);
+	// .then(function(reply) {
+	//     res.json(newGameRoom);
+	//     return next();
+	// }).catch(function(err) {
+	//     return next(err);
+	// });
+
+
+
+    // 	    if(err) {
+    // 	    return 'KO';
+    // 	} else {
+    // 	    console.log(reply);
+    // 	    return reply;
+    // 	}
+    // });
 };
 
 module.exports = GameRoomService;

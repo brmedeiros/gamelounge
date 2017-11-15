@@ -13,7 +13,7 @@ describe('server', function() {
     });
 
     afterEach(function() {
-    	//server.redisClient.flushdb();
+	server.redisClient.flushdb();
     });
 
     describe('createRoom', function() {
@@ -260,6 +260,7 @@ describe('server', function() {
 			});
 		});
 	});
+
 	it('should validate a name when an invalid code is provided while trying to join a room', function(done) {
 	    var userName;
 	    var gameCode;
@@ -271,7 +272,8 @@ describe('server', function() {
 		    gameCode = res.body.code + 'a';
 		    chai.request(server.restifyServer)
 			.post('/validate-username')
-			.send({username: userName})
+			.send({username: userName,
+			       code: gameCode})
 			.end(function(err, res){
 			    res.should.have.status(200);
 			    res.body.should.be.a('string');
@@ -280,6 +282,7 @@ describe('server', function() {
 			});
 		});
 	});
+
 	it('should not validate a name equal to the game creator when joining a room', function(done) {
 	    var userName;
 	    var gameCode;
@@ -301,6 +304,7 @@ describe('server', function() {
 			});
 		});
 	});
+
 	it('should not validate a name already in use by any of the players in the room when trying to join it', function(done) {
 	    var gameCode;
 	    chai.request(server.restifyServer)
@@ -321,6 +325,32 @@ describe('server', function() {
 				    res.should.have.status(200);
 				    res.body.should.be.a('string');
 				    res.body.should.equal('name already in use');
+				    done();
+				});
+			});
+		});
+	});
+
+	it('should validate a name different than any of names used in a valid game room', function(done) {
+	    var gameCode;
+	    chai.request(server.restifyServer)
+		.post('/create-room')
+		.send({username: 'mike'})
+		.end(function(err, res){
+		    gameCode = res.body.code;
+		    chai.request(server.restifyServer)
+			.post('/join-room')
+			.send({username: 'wike',
+			       code: gameCode})
+			.end(function(err, res){
+			    chai.request(server.restifyServer)
+				.post('/validate-username')
+				.send({username: 'tike',
+				       code: gameCode})
+				.end(function(err, res){
+				    res.should.have.status(200);
+				    res.body.should.be.a('string');
+				    res.body.should.equal('true');
 				    done();
 				});
 			});
