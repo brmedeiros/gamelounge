@@ -42,37 +42,38 @@ function createRoom(req, res, next) {
 
     } else {
 
-    var code = codeGen(5);
-    var newGameRoom  = new GameRoom(req.body.username, code);
+	var code = codeGen(5);
+	var newGameRoom  = new GameRoom(req.body.username, code);
 
-    //gameRoomService.save(newGameRoom);
-    //next();
-
-    // client.hmset(code, newGameRoom, function(err, reply) {
-    // 	if (err) {
-    // 	    console.log(err);
-    // 	    next(err);
-    // 	}
-    // 	res.json(newGameRoom);
-    // 	next();
-    // });
-
-    var redisTimeOut = setTimeout(function() {
-	console.log('RedisServer timeout...');
-	res.send(504, {errorMsg: 'Redis Server Timeout...'});
-	next();
-    }, 1000);
-
-    newGameRoom = gameRoomService.serialize(newGameRoom);
-    client.hmsetAsync(code, newGameRoom)
-	.then(function(reply) {
-	    clearTimeout(redisTimeOut);
-	    res.json(newGameRoom);
+	var redisTimeout = setTimeout(function() {
+	    console.log('redisServer timeout...');
+	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
 	    next();
-	}).catch(function(err) {
-	    clearTimeout(redisTimeOut);
-	    next(err);
-	});
+	}, 1000);
+
+	newGameRoom = gameRoomService.serialize(newGameRoom);
+	client.hmsetAsync(code, newGameRoom)
+	    .then(function(reply) {
+		clearTimeout(redisTimeout);
+		res.json(newGameRoom);
+		next();
+	    }).catch(function(err) {
+		clearTimeout(redisTimeout);
+		next(err);
+	    });
+
+	// gameRoomService.save(newGameRoom).then(function(reply) {
+	//     if (reply == 'saved') {
+	// 	res.json(newGameRoom);
+	// 	next();
+	//     } else if (reply == 'error') {
+	// 	res.send(500, {errorMSg: 'Redis internal error...'});
+	// 	next();
+	//     } else if (reply == 'timeout') {
+	// 	res.send(504, {errorMsg: 'Redis Server Timeout...'});
+	// 	next();
+	//     }
+	// });
     }
 }
 
@@ -109,7 +110,7 @@ function joinRoom(req, res, next) {
     // 	}
     // });
 
-	var redisTimeOut = setTimeout(function() {
+	var redisTimeout = setTimeout(function() {
 	    console.log('RedisServer timeout...');
 	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
 	    next();
@@ -122,12 +123,12 @@ function joinRoom(req, res, next) {
 		reply = gameRoomService.serialize(reply);
 		client.hmsetAsync(req.body.code, 'players', reply.players)
 		    .then(function() {
-			clearTimeout(redisTimeOut);
+			clearTimeout(redisTimeout);
 			res.json(reply);
 			next();
 		    });
 	    }).catch(function(err) {
-		clearTimeout(redisTimeOut);
+		clearTimeout(redisTimeout);
 		res.send(404, {errorMsg: 'please send a valid code'});
 		next();
 	    });
@@ -155,7 +156,7 @@ function validateCode(req, res, next) {
 	// 	}
 	// });
 
-	var redisTimeOut = setTimeout(function() {
+	var redisTimeout = setTimeout(function() {
 	    console.log('RedisServer timeout...');
 	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
 	    next();
@@ -164,11 +165,11 @@ function validateCode(req, res, next) {
 	client.hgetallAsync(req.body.code)
 	    .then(function(reply) {
 		if (reply == null) {
-		    clearTimeout(redisTimeOut);
+		    clearTimeout(redisTimeout);
 		    throw Error;
 		}
 	    }).then(function(reply) {
-		clearTimeout(redisTimeOut);
+		clearTimeout(redisTimeout);
 		res.json('true');
 		next();
 	    }).catch(function(err) {
@@ -202,7 +203,7 @@ function validateUsername(req, res, next) {
 	// 	return next();
 	// });
 
-	var redisTimeOut = setTimeout(function() {
+	var redisTimeout = setTimeout(function() {
 	    console.log('RedisServer timeout...');
 	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
 	    next();
@@ -210,7 +211,7 @@ function validateUsername(req, res, next) {
 
 	client.hgetallAsync(req.body.code)
 	    .then(function(reply) {
-		clearTimeout(redisTimeOut);
+		clearTimeout(redisTimeout);
 		if (JSON.parse(reply.players).includes(req.body.username)) {
 		    res.json('name already in use');
 		    next();

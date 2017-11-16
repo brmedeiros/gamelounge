@@ -1,17 +1,20 @@
 var GameRoomService = require('../gameRoomService');
 var server = require('../server');
 var chai = require('chai');
+var chaiAsPromised = require("chai-as-promised");
 var should = chai.should();
+
+chai.use(chaiAsPromised);
 
 describe('GameRoomService', function(){
 
     after(function() {
-	//server.restifyServer.close();
-	//server.redisClient.quit();
+	server.restifyServer.close();
+	server.redisClient.quit();
     });
 
     afterEach(function() {
-	//server.redisClient.flushdb();
+	server.redisClient.flushdb();
     });
 
     describe('GameRoomService.serialize', function(){
@@ -40,11 +43,10 @@ describe('GameRoomService', function(){
 
     describe('GameRoomService.saveRoom', function() {
 	it('should save a game room and all its properties to redis when a game is created', function(done) {
-	    var testGameRoom = {code: 'number', creator: 'mike', players: '["mike"]'};
+	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike']};
 	    var gameRoomService = new GameRoomService(server.redisClient);
-	    //should.exist(gameRoomService.save(testGameRoom));
-	    //gameRoomService.save(testGameRoom).should.be.a('string').equal('OK');
-	    console.log('ok');
+	    gameRoomService.save(testGameRoom).should.eventually.be.a('string').equal('saved');
+	    server.redisClient.keysAsync('number').should.eventually.be.a('array').eql(['number']);
 	    done();
 	});
     });

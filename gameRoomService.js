@@ -1,5 +1,3 @@
-var server = require('./server');
-
 function GameRoomService(redisClient) {
     this.redisClient = redisClient;
 }
@@ -16,26 +14,37 @@ GameRoomService.prototype.parse = function(gameRoomSerialized) {
     return gameRoomSerializedCopy;
 };
 
+// GameRoomService.prototype.redisClientTimeout = function() {
+//     var promise = new Promise(function(resolve, reject) {
+// 	setTimeout(function() {
+// 	    console.log('RedisServer timeout...');
+// 	    resolve();
+// 	}, 1);
+// 	return promise;
+//     });
+// };
+
 GameRoomService.prototype.save = function(gameRoom) {
     var gameRoomCopy = Object.assign({}, gameRoom);
     gameRoomCopy = this.serialize(gameRoom);
-    this.redisClient.hmsetAsync(gameRoomCopy.code, gameRoomCopy);
-	// .then(function(reply) {
-	//     res.json(newGameRoom);
-	//     return next();
-	// }).catch(function(err) {
-	//     return next(err);
-	// });
 
-
-
-    // 	    if(err) {
-    // 	    return 'KO';
-    // 	} else {
-    // 	    console.log(reply);
-    // 	    return reply;
-    // 	}
+    // var redisTimeout = this.redisClientTimeout().then(function (done) {
+    // 	return 'timeout';
     // });
+
+    var redisTimeout = setTimeout(function() {
+	console.log('RedisServer timeout...');
+	return 'timeout'; //PROBLEM HERE
+    }, 1000);
+
+    return this.redisClient.hmsetAsync(gameRoomCopy.code, gameRoomCopy)
+	.then(function(reply) {
+	    clearTimeout(redisTimeout);
+	    return 'saved';
+	}).catch(function(err) {
+	    clearTimeout(redisTimeout);
+	    return 'error';
+	});
 };
 
 module.exports = GameRoomService;
