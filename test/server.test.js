@@ -27,7 +27,7 @@ describe('server', function() {
 		    res.body.should.have.property('code');
 		    res.body.should.have.property('creator').equal('jonh');
 		    res.body.should.have.property('players');
-		    res.body.players.should.be.a('string');
+		    res.body.players.should.be.a('array');
 		    res.body.players.should.contain('jonh');
 		    done();
 		});
