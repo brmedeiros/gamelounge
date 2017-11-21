@@ -42,11 +42,11 @@ describe('GameRoomService', function(){
     });
 
     describe('save', function() {
-	it('should return "saved" when it is successful', function() {
+	it('should return "OK" when it is successful', function() {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike']};
 	    var gameRoomService = new GameRoomService(server.redisClient);
 	    var test = gameRoomService.save(testGameRoom);
-	    return test.should.eventually.be.a('string').equal('saved');
+	    return test.should.eventually.be.a('string').equal('OK');
 	});
 
 	it('should save a game room and all its properties to redis when a game is created', function() {
@@ -64,42 +64,12 @@ describe('GameRoomService', function(){
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
 	    var newPlayer = 'tike';
 	    var gameRoomService = new GameRoomService(server.redisClient);
-	    return gameRoomService.save(testGameRoom).then(function() {
-	    var test = gameRoomService.update('number', newPlayer);
-	    return test.should.eventually.be.a('object');
-	    });
-
-		//     server.redisClient.hgetallAsync('number').should.eventually.be.a('Object');
-		//     server.redisClient.hgetallAsync('number').should.eventually.have.property('code').equal('number');
-		//     server.redisClient.hgetallAsync('number').should.eventually.have.property('creator').equal('mike');
-		//     server.redisClient.hgetallAsync('number').should.eventually.have.property('players').equal('["mike","wike","tike"]');
-		//     done();
-		// }).catch(function(err) {
-		//     done();
-		// });
+	    return gameRoomService.save(testGameRoom)
+		.then(function() {
+		    var test = gameRoomService.update('number', newPlayer);
+		    return test.should.eventually.be.a('object')
+			.and.should.eventually.have.property('players').equal('["mike","wike","tike"]');
+		});
 	});
-
-	// it('should update the player list when a new player joins the game room', function(done) {
-	//     var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
-	//     var newPlayer = 'tike';
-	//     var gameRoomService = new GameRoomService(server.redisClient);
-	//     gameRoomService.save(testGameRoom)
-	// 	.then(function(reply) {
-	// 	    reply.should.be.a('string').equal('saved');
-	// 	    return gameRoomService.update(testGameRoom.code, newPlayer);
-	// 	}).then(function(reply) {
-	// 	    reply.should.be.a('string').equal('updated');
-	// 	    return server.redisClient.hgetallAsync('number');
-	// 	}).then(function(reply) {
-	// 	    reply.should.be.a('Object');
-	// 	    reply.should.have.property('code').equal('number');
-	// 	    reply.should.have.property('creator').equal('mike');
-	// 	    reply.should.have.property('players').equal('["mike","wike","tike"]');
-	// 	    done();
-	// 	}).catch(function(err) {
-	// 	    done();
-	//     });
-	// });
-
     });
 });

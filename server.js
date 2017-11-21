@@ -45,35 +45,19 @@ function createRoom(req, res, next) {
 	var code = codeGen(5);
 	var newGameRoom  = new GameRoom(req.body.username, code);
 
-	// var redisTimeout = setTimeout(function() {
-	//     console.log('redisServer timeout...');
-	//     res.send(504, {errorMsg: 'Redis Server Timeout...'});
-	//     next();
-	// }, 1000);
-
-	// newGameRoom = gameRoomService.serialize(newGameRoom);
-	// client.hmsetAsync(code, newGameRoom)
-	//     .then(function(reply) {
-	// 	clearTimeout(redisTimeout);
-	// 	res.json(newGameRoom);
-	// 	next();
-	//     }).catch(function(err) {
-	// 	clearTimeout(redisTimeout);
-	// 	next(err);
-	//     });
-
-	gameRoomService.save(newGameRoom).then(function(reply) {
-	    if (reply == 'saved') {
+	gameRoomService.save(newGameRoom)
+	    .then(function(reply) {
 		res.json(newGameRoom);
 		next();
-	    } else if (reply == 'error') {
-		res.send(500, {errorMSg: 'Redis internal error...'});
-		next();
-	    } else if (reply == 'timeout') {
-		res.send(504, {errorMsg: 'Redis Server Timeout...'});
-		next();
-	    }
-	});
+	    }).catch(function(err) {
+		if(err instanceof GameRoomService.TimeoutError) {
+		    res.send(504, {errorMSg: 'Timeout error...'});
+		    next();
+		} else {
+		    res.send(500, {errorMSg: 'Persistance error...'});
+		    next();
+		}
+	    });
     }
 }
 
@@ -85,45 +69,22 @@ function joinRoom(req, res, next) {
     } else if (req.body.username == '' || req.body.code == '' || req.body.username == undefined || req.body.code == undefined) {
 	res.send(422, {errorMsg: 'please send an object with a code and username'});
 	next();
+
     } else {
 
-	var redisTimeout = setTimeout(function() {
-	    console.log('RedisServer timeout...');
-	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
-	    next();
-	}, 1000);
-
-	var updatedGameRoom;
-
-	client.hgetallAsync(req.body.code)
+	gameRoomService.update(req.body.code, req.body.username)
 	    .then(function(reply) {
-		reply = gameRoomService.parse(reply);
-		reply.players.push(req.body.username);
-		reply = gameRoomService.serialize(reply);
-		updatedGameRoom = Object.assign({}, reply);
-		return client.hmsetAsync(req.body.code, 'players', reply.players);
-	    }).then(function(reply) {
-		clearTimeout(redisTimeout);
-		res.json(updatedGameRoom);
+		res.json(reply);
 		next();
-	    }).catch(function(err) {
-		clearTimeout(redisTimeout);
-		res.send(404, {errorMsg: 'please send a valid code'});
-		next();
+	    }).catch( function(err) {
+		if(err instanceof GameRoomService.TimeoutError) {
+		    res.send(504, {errorMsg: 'Timeout error...'});
+		    next();
+		} else {
+		    res.send(404, {errorMsg: 'please send a valid code'});
+		    next();
+		}
 	    });
-
-	// gameRoomService.update(req.body.code, req.body.username).then(function(reply) {
-	//     if (reply == 'updated') {
-	// 	res.json(newGameRoom);
-	// 	next();
-	//     } else if (reply == 'error') {
-	// 	res.send(500, {errorMSg: 'Redis internal error...'});
-	// 	next();
-	//     } else if (reply == 'timeout') {
-	// 	res.send(504, {errorMsg: 'Redis Server Timeout...'});
-	// 	next();
-	//     }
-	// });
     }
 }
 
@@ -137,16 +98,6 @@ function validateCode(req, res, next) {
 	next();
 
     } else {
-
-	// client.hgetallA(req.body.code, function (err, reply){
-	// 	if (reply){
-	// 	    res.json('true');
-	// 	    return next();
-	// 	} else {
-	// 	    res.json('enter a valid code'); //invalid form msg
-	// 	    return next();
-	// 	}
-	// });
 
 	var redisTimeout = setTimeout(function() {
 	    console.log('RedisServer timeout...');
