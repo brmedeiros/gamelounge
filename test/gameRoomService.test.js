@@ -67,9 +67,60 @@ describe('GameRoomService', function(){
 	    return gameRoomService.save(testGameRoom)
 		.then(function() {
 		    var test = gameRoomService.update('number', newPlayer);
-		    return test.should.eventually.be.a('object')
+		    test.should.eventually.be.a('object')
 			.and.should.eventually.have.property('players').equal('["mike","wike","tike"]');
 		});
+	});
+    });
+
+    describe('validateCode', () => {
+	it('should validate a code with if the room exists', () => {
+	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
+	    var gameRoomService = new GameRoomService(server.redisClient);
+	    return gameRoomService.save(testGameRoom).then(() => {
+		var test = gameRoomService.validateCode('number');
+		test.should.eventually.be.a('object')
+		    .and.should.eventually.include({creator: 'mike'})
+		    .and.should.eventually.have.property('players').equal('["mike","wike"]');
+	    });
+	});
+
+	it('should not validate a room when if the room does not exist', () => {
+	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var test = gameRoomService.validateCode('invalidcode');
+	    test.should.eventually.be.rejectedWith('invalid code');
+	});
+    });
+
+    describe('validateUsername', () => {
+	it('should not validate a username with if the room exists and the name is in use', () => {
+	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
+	    var newPlayer = 'mike';
+	    var gameRoomService = new GameRoomService(server.redisClient);
+	    return gameRoomService.save(testGameRoom).then(() => {
+		var test = gameRoomService.validateUsername('number', newPlayer);
+		test.should.eventually.be.a('string').equal('name already in use');
+	    });
+	});
+
+	it('should validate a username with if the room exists and the name is not in use', () => {
+	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
+	    var newPlayer = 'tike';
+	    var gameRoomService = new GameRoomService(server.redisClient);
+	    return gameRoomService.save(testGameRoom).then(() => {
+		var test = gameRoomService.validateUsername('number', newPlayer);
+		test.should.eventually.be.a('string').equal('true');
+	    });
+	});
+
+	it('should validate a username with if the room does not exist', () => {
+	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
+	    var newPlayer = 'mike';
+	    var gameRoomService = new GameRoomService(server.redisClient);
+	    return gameRoomService.save(testGameRoom).then(() => {
+		var test = gameRoomService.validateUsername('invalidcode', newPlayer);
+		test.should.eventually.be.rejectedWith('invalid code');
+	    });
 	});
     });
 });

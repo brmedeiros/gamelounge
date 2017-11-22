@@ -5,7 +5,6 @@ var bluebird = require("bluebird");
 var GameRoomService = require('./gameRoomService');
 const uuidv4 = require('uuid/v4');
 
-
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
@@ -32,11 +31,11 @@ function GameRoom(creator, code) {
 }
 
 function createRoom(req, res, next) {
-    if (req.body == undefined) {
+    if (!req.body) {
 	res.send(400, {errorMsg: 'please send an object with a username, e.g.:{username:john}'});
 	next();
 
-    } else if (req.body.username == '' || req.body.username == undefined) {
+    } else if (!req.body.username) {
 	res.send(422, {errorMsg: 'please send an object with a username, e.g.:{username:john}'});
 	next();
 
@@ -62,11 +61,11 @@ function createRoom(req, res, next) {
 }
 
 function joinRoom(req, res, next) {
-    if (req.body == undefined) {
+    if (!req.body) {
 	res.send(400, {errorMsg: 'please send an object with a code and username'});
 	next();
 
-    } else if (req.body.username == '' || req.body.code == '' || req.body.username == undefined || req.body.code == undefined) {
+    } else if (!req.body.username || !req.body.code) {
 	res.send(422, {errorMsg: 'please send an object with a code and username'});
 	next();
 
@@ -76,8 +75,8 @@ function joinRoom(req, res, next) {
 	    .then(function(reply) {
 		res.json(reply);
 		next();
-	    }).catch( function(err) {
-		if(err instanceof GameRoomService.TimeoutError) {
+	    }).catch(function(err) {
+		if (err instanceof GameRoomService.TimeoutError) {
 		    res.send(504, {errorMsg: 'Timeout error...'});
 		    next();
 		} else {
@@ -89,82 +88,59 @@ function joinRoom(req, res, next) {
 }
 
 function validateCode(req, res, next) {
-    if (req.body == undefined) {
+    if (!req.body) {
 	res.send(400, {errorMsg: 'please send an object with a valid code'});
 	next();
 
-    } else if (req.body.code == '' || req.body.code == undefined) {
+    } else if (!req.body.code) {
 	res.send(422, {errorMsg: 'please send an object with a valid code'});
 	next();
 
     } else {
 
-	var redisTimeout = setTimeout(function() {
-	    console.log('RedisServer timeout...');
-	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
-	    next();
-	}, 1000);
-
-	client.hgetallAsync(req.body.code)
-	    .then(function(reply) {
-		if (reply == null) {
-		    clearTimeout(redisTimeout);
-		    throw Error;
-		}
-	    }).then(function(reply) {
-		clearTimeout(redisTimeout);
+	gameRoomService.validateCode(req.body.code)
+	    .then((reply) => {
 		res.json('true');
 		next();
-	    }).catch(function(err) {
-		res.json('enter a valid code'); //invalid form msg
-		next();
+	    }).catch((err) => {
+		if (err instanceof GameRoomService.TimeoutError) {
+		    res.send(504, {errorMsg: 'Timeout error...'});
+		    next();
+		} else {
+		    res.json('enter a valid code'); //invalid form msg
+		    next();
+		}
 	    });
     }
 }
 
 function validateUsername(req, res, next) {
-    if (req.body == undefined) {
+    if (!req.body) {
 	res.send(400, {errorMsg: 'please send an object with a valid username'});
 	next();
 
-    } else if (req.body.username == '' || req.body.username == undefined) {
+    } else if (!req.body.username) {
 	res.send(422, {errorMsg: 'please send an object with a valid username'});
 	next();
 
-    } else if (req.body.code == '' || req.body.code == undefined) {
+    } else if (!req.body.code) {
 	res.json('true');
 	next();
 
     } else {
 
-	// client.hgetall(req.body.code, function (err, reply){
-	// 	if (reply && JSON.parse(reply.players).includes(req.body.username)){
-	// 	    res.json('name already in use');
-	// 	    return next();
-	// 	}
-	// 	res.json('true');
-	// 	return next();
-	// });
-
-	var redisTimeout = setTimeout(function() {
-	    console.log('RedisServer timeout...');
-	    res.send(504, {errorMsg: 'Redis Server Timeout...'});
-	    next();
-	}, 1000);
-
-	client.hgetallAsync(req.body.code)
-	    .then(function(reply) {
-		clearTimeout(redisTimeout);
-		if (JSON.parse(reply.players).includes(req.body.username)) {
-		    res.json('name already in use');
+	gameRoomService.validateUsername(req.body.code, req.body.username)
+	    .then((reply) => {
+		res.json(reply);
+		next();
+	    }).catch((err) => {
+		if (err instanceof GameRoomService.TimeoutError) {
+		    res.send(504, {errorMsg: 'Timeout error...'});
 		    next();
 		} else {
-		    res.json('true');
-		    next();
-		}
-	    }).catch(function(err) {
 		res.json('true');
 		next();
+		}
 	    });
     }
 }
