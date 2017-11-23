@@ -45,10 +45,10 @@ function createRoom(req, res, next) {
 	var newGameRoom  = new GameRoom(req.body.username, code);
 
 	gameRoomService.save(newGameRoom)
-	    .then(function(reply) {
+	    .then((reply) => {
 		res.json(newGameRoom);
 		next();
-	    }).catch(function(err) {
+	    }).catch((err) => {
 		if(err instanceof GameRoomService.TimeoutError) {
 		    res.send(504, {errorMSg: 'Timeout error...'});
 		    next();
