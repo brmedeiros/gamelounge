@@ -1,0 +1,40 @@
+{
+  "name": "game-lounge",
+  "version": "1.0.0",
+  "description": "A Nodejs and rest exercise",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-http": "^3.0.0",
+    "i": "^0.3.6",
+    "promise-timeout": "^1.1.1",
+    "redis": "^2.8.0",
+    "restify": "^6.0.0",
+    "restify-cookies": "^0.2.2",
+    "uuid": "^3.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha ./test/*.test.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brmedeiros/gamelounge.git"
+  },
+  "keywords": [
+    "javascript",
+    "exercise"
+  ],
+  "author": "Bruno Medeiros",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brmedeiros/gamelounge/issues"
+  },
+  "homepage": "https://github.com/brmedeiros/gamelounge#readme"
+}
