@@ -10,7 +10,7 @@ describe('GameRoomService', function(){
 
     after(function() {
 	server.restifyServer.close();
-	server.redisClient.quit();
+	//server.redisClient.quit();
     });
 
     afterEach(function() {
