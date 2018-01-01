@@ -15,6 +15,7 @@
     "mocha": "^4.1.0",
     "promise-timeout": "^1.1.1",
     "redis": "^2.8.0",
+    "redis-server": "^1.1.0",
     "restify": "^6.0.0",
     "restify-cookies": "^0.2.2",
     "uuid": "^3.1.0"
