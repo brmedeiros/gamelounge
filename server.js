@@ -146,7 +146,7 @@ function validateUsername(req, res, next) {
 }
 
 var server = restify.createServer({name: 'Game Lounge'});
-var client = redis.createClient({host: 'localhost', port: 6379});
+var client = redis.createClient(process.env.REDIS_URL);
 var gameRoomService = new GameRoomService(client);
 
 client.on('connect', function() {
