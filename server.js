@@ -1,7 +1,6 @@
 var restify = require('restify');
 var CookieParser = require('restify-cookies');
 var redis = require("redis");
-const RedisServer = require('redis-server');
 var bluebird = require("bluebird");
 var GameRoomService = require('./gameRoomService');
 const uuidv4 = require('uuid/v4');
@@ -147,10 +146,6 @@ function validateUsername(req, res, next) {
 }
 
 var server = restify.createServer({name: 'Game Lounge'});
-const redisServer = new RedisServer(6379);
-redisServer.open();
-redisServer.close();
-
 var client = redis.createClient({host: 'localhost', port: 6379});
 var gameRoomService = new GameRoomService(client);
 
@@ -181,7 +176,5 @@ server.listen(8080, function() {
 });
 
 module.exports = {
-    restifyServer: server,
-    redisServer: redisServer,
-    redisClient: client
+    restifyServer: server
 };

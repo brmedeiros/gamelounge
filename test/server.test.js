@@ -1,7 +1,18 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
-var server = require('../server');
+var redis = require('redis');
+var fakeredis = require('fakeredis');
 var should = chai.should();
+var bluebird = require('bluebird');
+
+redis.createClient = function() {
+    return fakeredis.createClient();
+};
+
+bluebird.promisifyAll(fakeredis.RedisClient.prototype);
+bluebird.promisifyAll(fakeredis.Multi.prototype);
+
+var server = require('../server');
 
 chai.use(chaiHttp);
 
@@ -9,12 +20,6 @@ describe('server', function() {
 
     after(function() {
 	server.restifyServer.close();
-	server.redisClient.quit();
-	server.redisServer.close();
-    });
-
-    afterEach(function() {
-	server.redisClient.flushdb();
     });
 
     describe('createRoom', function() {

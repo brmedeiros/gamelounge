@@ -1,27 +1,27 @@
 var GameRoomService = require('../gameRoomService');
-var server = require('../server');
+var redis = require('fakeredis');
 var chai = require('chai');
 var chaiAsPromised = require("chai-as-promised");
 var should = chai.should();
+var bluebird = require('bluebird');
 
 chai.use(chaiAsPromised);
 
+var redisClient;
+
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+
 describe('GameRoomService', function(){
 
-    after(function() {
-	server.restifyServer.close();
-	//server.redisClient.quit();
-	//server.redisServer.close();
-    });
-
-    afterEach(function() {
-	server.redisClient.flushdb();
+    beforeEach(function() {
+	redisClient = redis.createClient();
     });
 
     describe('serialize', function(){
 	it('should serialize a gameRoom object so it can be saved in a redis db', function(){
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike']};
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    gameRoomService.serialize(testGameRoom).should.be.a('object');
 	    gameRoomService.serialize(testGameRoom).should.have.property('code').equal('number');
 	    gameRoomService.serialize(testGameRoom).should.have.property('creator').equal('mike');
@@ -33,7 +33,7 @@ describe('GameRoomService', function(){
     describe('parse', function() {
 	it('should parse a serialized gameRoom', function() {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: '["mike"]'};
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    gameRoomService.parse(testGameRoom).should.be.a('object');
 	    gameRoomService.parse(testGameRoom).should.have.property('code').equal('number');
 	    gameRoomService.parse(testGameRoom).should.have.property('creator').equal('mike');
@@ -45,16 +45,16 @@ describe('GameRoomService', function(){
     describe('save', function() {
 	it('should return "OK" when it is successful', function() {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike']};
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    var test = gameRoomService.save(testGameRoom);
 	    return test.should.eventually.be.a('string').equal('OK');
 	});
 
 	it('should save a game room and all its properties to redis when a game is created', function() {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike']};
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    gameRoomService.save(testGameRoom);
-	    var test = server.redisClient.keysAsync('number');
+	    var test = redisClient.keysAsync('number');
 	    return test.should.eventually.be.a('array').eql(['number']);
 	});
 
@@ -64,7 +64,7 @@ describe('GameRoomService', function(){
 	it('should return the updated game room when it is successful', function() {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
 	    var newPlayer = 'tike';
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    return gameRoomService.save(testGameRoom)
 		.then(function() {
 		    var test = gameRoomService.update('number', newPlayer);
@@ -77,7 +77,7 @@ describe('GameRoomService', function(){
     describe('validateCode', () => {
 	it('should validate a code with if the room exists', () => {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    return gameRoomService.save(testGameRoom).then(() => {
 		var test = gameRoomService.validateCode('number');
 		test.should.eventually.be.a('object')
@@ -87,7 +87,7 @@ describe('GameRoomService', function(){
 	});
 
 	it('should not validate a room when if the room does not exist', () => {
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    var test = gameRoomService.validateCode('invalidcode');
 	    test.should.eventually.be.rejectedWith('invalid code');
 	});
@@ -97,7 +97,7 @@ describe('GameRoomService', function(){
 	it('should not validate a username with if the room exists and the name is in use', () => {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
 	    var newPlayer = 'mike';
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    return gameRoomService.save(testGameRoom).then(() => {
 		var test = gameRoomService.validateUsername('number', newPlayer);
 		test.should.eventually.be.a('string').equal('name already in use');
@@ -107,7 +107,7 @@ describe('GameRoomService', function(){
 	it('should validate a username with if the room exists and the name is not in use', () => {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
 	    var newPlayer = 'tike';
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    return gameRoomService.save(testGameRoom).then(() => {
 		var test = gameRoomService.validateUsername('number', newPlayer);
 		test.should.eventually.be.a('string').equal('true');
@@ -117,7 +117,7 @@ describe('GameRoomService', function(){
 	it('should validate a username with if the room does not exist', () => {
 	    var testGameRoom = {code: 'number', creator: 'mike', players: ['mike','wike']};
 	    var newPlayer = 'mike';
-	    var gameRoomService = new GameRoomService(server.redisClient);
+	    var gameRoomService = new GameRoomService(redisClient);
 	    return gameRoomService.save(testGameRoom).then(() => {
 		var test = gameRoomService.validateUsername('invalidcode', newPlayer);
 		test.should.eventually.be.rejectedWith('invalid code');
