@@ -171,7 +171,7 @@ server.get(/.*/, restify.plugins.serveStatic({
     'default': 'home.html'
 }));
 
-server.listen(8080, function() {
+server.listen(process.env.PORT, function() {
     console.log('%s listening at %s', server.name, server.url);
 });
 
